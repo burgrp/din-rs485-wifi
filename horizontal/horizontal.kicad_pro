@@ -57,6 +57,7 @@
       ],
       "drc_exclusions": [
         "lib_footprint_mismatch|101450000|129000000|b00bf85c-36db-4f87-b073-d04e6b2c327d|00000000-0000-0000-0000-000000000000",
+        "lib_footprint_mismatch|123021250|128356250|9756874b-245e-4d3c-87ae-67c09fbd0df9|00000000-0000-0000-0000-000000000000",
         "lib_footprint_mismatch|123810000|131000000|9756874b-245e-4d3c-87ae-67c09fbd0df9|00000000-0000-0000-0000-000000000000",
         "lib_footprint_mismatch|145575000|99862500|930684a8-d76f-452a-a865-86a7f8033e0e|00000000-0000-0000-0000-000000000000",
         "lib_footprint_mismatch|169426250|103643750|b3887568-eb44-4a91-9968-d1cf8aa965dd|00000000-0000-0000-0000-000000000000",
@@ -471,7 +472,7 @@
       "idf": "",
       "netlist": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "../../../tmp/h.step",
       "vrml": ""
     },
     "page_layout_descr_file": ""
