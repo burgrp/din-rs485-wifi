@@ -1,0 +1,6 @@
+Designator,Footprint,Quantity,Value,LCSC Part #
+J1,PinSocket_1x04_P2.54mm_Vertical,1,internal,
+J3,DG235-3.81-02P,1,Mains,
+J4,DG235-3.81-03P,1,RS485,
+RV1,R_1210_3225Metric_Pad1.30x2.65mm_HandSolder,1,B72650M251K72,
+U4,RQG 5V-0.6A-vertical,1,PSU,

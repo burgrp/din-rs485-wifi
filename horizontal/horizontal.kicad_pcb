@@ -418,7 +418,7 @@
     (stroke (width 0.1) (type default)) (layer "Edge.Cuts") (tstamp cd2b94d0-e31c-49ae-8ded-9aa7a0ef7b1e))
   (gr_arc (start 155 134) (mid 154.707107 134.707107) (end 154 135)
     (stroke (width 0.1) (type default)) (layer "Edge.Cuts") (tstamp f7e56ef0-1ebb-46fd-9e34-5cea14bbbab9))
-  (gr_text "din-rs485-wifi v1.0" (at 116 123) (layer "F.SilkS") (tstamp de017ba3-6d6f-48de-bbda-bc1c554b8cf9)
+  (gr_text "RS485 WiFi v1.0" (at 116 123) (layer "F.SilkS") (tstamp de017ba3-6d6f-48de-bbda-bc1c554b8cf9)
     (effects (font (size 1.5 1.5) (thickness 0.3) bold) (justify left bottom))
   )
   (dimension (type aligned) (layer "Dwgs.User") (tstamp 17838ff9-ff83-4a34-9e29-3f9cbfbb0fbb)
