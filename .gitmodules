@@ -1,0 +1,6 @@
+[submodule "fw/sub/micropython-mqtt"]
+	path = fw/sub/micropython-mqtt
+	url = https://github.com/peterhinch/micropython-mqtt.git
+[submodule "fw/sub/micropython-modbus"]
+	path = fw/sub/micropython-modbus
+	url = https://gitlab.com/extel-open-source/micropython-modbus.git

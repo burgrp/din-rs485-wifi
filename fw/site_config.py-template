@@ -1,0 +1,4 @@
+wifi_ssid = '416T'
+wifi_password='????'
+mqtt_broker='10.1.0.12'
+debug=False
