@@ -8,6 +8,8 @@ from machine import Pin
 
 class Registry:
 
+    advertise_in_progress = False
+
     def __init__(self, handler, wifi_ssid, wifi_password, mqtt_broker, ledPin=2, ledLogic=True, debug=False):
         self.handler = handler
         self.debug = debug
@@ -15,7 +17,7 @@ class Registry:
         mqtt_config['ssid'] = wifi_ssid
         mqtt_config['wifi_pw'] = wifi_password
         mqtt_config['server'] = mqtt_broker
-        mqtt_config['queue_len'] = 1
+        mqtt_config['queue_len'] = 32
 
         mqtt_as.MQTTClient.DEBUG = debug
         self.mqtt_client = mqtt_as.MQTTClient(mqtt_config)
@@ -33,16 +35,35 @@ class Registry:
 
         message = message.getvalue()
 
-        await self.mqtt_client.publish(topic, message)
+        await self.mqtt_client.publish(topic, message, qos=1)
 
-    async def publish_register_value(self, name):
-        value = await self.handler.get_value(name)
-        await self.__publish_json('register/'+name+'/is', value)
 
-    async def advertise_registers(self):
-        for name in self.handler.get_names():
-            meta = self.handler.get_meta(name)
-            await self.__publish_json('register/'+name+'/advertise', meta)
+    def publish_register_value(self, name):
+
+        async def do_async():
+            value = self.handler.get_value(name)
+            await self.__publish_json('register/'+name+'/is', value)
+
+        uasyncio.create_task(do_async())
+
+
+    def advertise_registers(self):
+
+        async def do_async():
+
+            self.advertise_in_progress = True
+            try:
+
+                for name in self.handler.get_names():
+                    meta = self.handler.get_meta(name)
+                    await self.__publish_json('register/'+name+'/advertise', meta)
+
+            finally:
+                self.advertise_in_progress = False
+
+        if not self.advertise_in_progress:
+            uasyncio.create_task(do_async())
+
 
     async def run(self):
         await self.mqtt_client.connect()
@@ -57,17 +78,22 @@ class Registry:
                     if self.debug:
                         print('Subscribing to:', topic)
 
-                    await self.mqtt_client.subscribe(topic, 1)
+                    await self.mqtt_client.subscribe(topic, qos=1)
 
                 await subscribe('register/advertise!')
 
-                for name in self.handler.get_names():
-                    await subscribe('register/'+name+'/get')
-                    await subscribe('register/'+name+'/set')
+                await subscribe('register/+/get')
+                await subscribe('register/+/set')
 
-                await self.advertise_registers()
+                # for name in self.handler.get_names():
+                #     await subscribe('register/'+name+'/get')
+                #     await subscribe('register/'+name+'/set')
+
+                self.advertise_registers()
+
 
         uasyncio.create_task(up_event_loop())
+
 
         async def down_event_loop():
             while True:
@@ -75,35 +101,35 @@ class Registry:
                 self.mqtt_client.down.clear()
                 self.led(False)
 
+
         uasyncio.create_task(down_event_loop())
 
         async def read_messages():
             async for topic, message, retained in self.mqtt_client.queue:
-                try:
-                    topic = topic.decode()
-                    print(topic, "-->")
+                if not retained:
+                    try:
+                        topic = topic.decode()
 
-                    if topic == 'register/advertise!':
-                        await self.advertise_registers()
+                        if topic == 'register/advertise!':
+                            self.advertise_registers()
 
-                    else:
-                        value = None if len(message) == 0 else ujson.load(
-                            uio.BytesIO(message.decode()))
+                        else:
 
-                        for name in self.handler.get_names():
+                            for name in self.handler.get_names():
 
-                            if topic == 'register/'+name+'/get':
-                                await self.publish_register_value(name)
+                                if topic == 'register/'+name+'/get':
+                                    self.publish_register_value(name)
 
-                            if topic == 'register/'+name+'/set':
-                                await self.handler.set_value(name, value)
-                                await self.publish_register_value(name)
+                                if topic == 'register/'+name+'/set':
+                                    value = None if len(message) == 0 else ujson.load(uio.BytesIO(message.decode()))
+                                    self.handler.set_value(name, value)
+                                    self.publish_register_value(name)
 
-                    print("<--", topic)
-
-                except Exception as e:
-                    if self.debug:
-                        print('Error handling message because:', e)
+                    except Exception as e:
+                        if self.debug:
+                            print('Error handling message because:', e)
+                else:
+                    print("RETAINED")
 
         await read_messages()
 
@@ -128,10 +154,10 @@ class Registry:
 #             "title": "test register " + name
 #         }
 
-#     async def get_value(self, name):
+#     def get_value(self, name):
 #         return self.registers[name]
 
-#     async def set_value(self, name, value):
+#     def set_value(self, name, value):
 #         self.registers[name] = value
 
 
