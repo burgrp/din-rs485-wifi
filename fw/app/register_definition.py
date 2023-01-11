@@ -1,7 +1,7 @@
 class Register:
-    def __init__(self, address, name, description, unit):
+    def __init__(self, address, name, title, unit):
         self.address = address
         self.name = name
-        self.description = description
+        self.title = title
         self.unit = unit
 

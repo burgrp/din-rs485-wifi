@@ -41,14 +41,41 @@ print('MODBUS Energy Meter to WiFi bridge')
 # for device in site_config.devices:
 #     for r in devices.registers:
 
-registers = {
-    "a": 1,
-    "b": 2,
-    "c": 3
-}
+class Register:
+    def __init__(self, device, regdef):
+        self.device = device
+        self.regdef = regdef
+        self.value = 1
+
+class RegistryHandler:
+
+    registers = {}
+
+    def __init__(self):
+        for device in site_config.devices:
+            for regdef in device["registers"]:
+                name = device["name"] + "." + regdef.name
+                self.registers[name] = Register(device, regdef)
+
+    def get_names(self):
+        return self.registers.keys()
+
+    def get_meta(self, name):
+        return {
+            "device": "test",
+            "title": self.registers[name].regdef.title,
+            "unit": self.registers[name].regdef.unit
+        }
+
+    async def get_value(self, name):
+        return self.registers[name].value
+
+    async def set_value(self, name, value):
+        pass
+
 
 registry = mqtt_reg.Registry(
-    registers,
+    RegistryHandler(),
     wifi_ssid=site_config.wifi_ssid,
     wifi_password=site_config.wifi_password,
     mqtt_broker=site_config.mqtt_broker,

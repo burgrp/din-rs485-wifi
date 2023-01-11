@@ -8,8 +8,8 @@ from machine import Pin
 
 class Registry:
 
-    def __init__(self, registers, wifi_ssid, wifi_password, mqtt_broker, ledPin=2, ledLogic=True, debug=False):
-        self.registers = registers
+    def __init__(self, handler, wifi_ssid, wifi_password, mqtt_broker, ledPin=2, ledLogic=True, debug=False):
+        self.handler = handler
         self.debug = debug
         mqtt_config = mqtt_as.config.copy()
         mqtt_config['ssid'] = wifi_ssid
@@ -35,15 +35,13 @@ class Registry:
 
         await self.mqtt_client.publish(topic, message)
 
-    async def publish_register_value(self, register):
-        name = register.get_name()
-        value = await register.get_value()
+    async def publish_register_value(self, name):
+        value = await self.handler.get_value(name)
         await self.__publish_json('register/'+name+'/is', value)
 
     async def advertise_registers(self):
-        for register in self.registers:
-            name = register.get_name()
-            meta = register.get_meta()
+        for name in self.handler.get_names():
+            meta = self.handler.get_meta(name)
             await self.__publish_json('register/'+name+'/advertise', meta)
 
     async def run(self):
@@ -63,8 +61,7 @@ class Registry:
 
                 await subscribe('register/advertise!')
 
-                for register in self.registers:
-                    name = register.get_name()
+                for name in self.handler.get_names():
                     await subscribe('register/'+name+'/get')
                     await subscribe('register/'+name+'/set')
 
@@ -82,29 +79,31 @@ class Registry:
 
         async def read_messages():
             async for topic, message, retained in self.mqtt_client.queue:
-                if not retained:
-                    try:
-                        topic = topic.decode()
-                        if topic == 'register/advertise!':
-                            await self.advertise_registers()
+                try:
+                    topic = topic.decode()
+                    print(topic, "-->")
 
-                        else:
-                            value = None if len(message) == 0 else ujson.load(
-                                uio.BytesIO(message.decode()))
+                    if topic == 'register/advertise!':
+                        await self.advertise_registers()
 
-                            for register in self.registers:
-                                name = register.get_name()
+                    else:
+                        value = None if len(message) == 0 else ujson.load(
+                            uio.BytesIO(message.decode()))
 
-                                if topic == 'register/'+name+'/get':
-                                    await self.publish_register_value(register)
+                        for name in self.handler.get_names():
 
-                                if topic == 'register/'+name+'/set':
-                                    await register.set_value(value)
-                                    await self.publish_register_value(register)
+                            if topic == 'register/'+name+'/get':
+                                await self.publish_register_value(name)
 
-                    except Exception as e:
-                        if self.debug:
-                            print('Error handling message because:', e)
+                            if topic == 'register/'+name+'/set':
+                                await self.handler.set_value(name, value)
+                                await self.publish_register_value(name)
+
+                    print("<--", topic)
+
+                except Exception as e:
+                    if self.debug:
+                        print('Error handling message because:', e)
 
         await read_messages()
 
@@ -113,28 +112,36 @@ class Registry:
         _thread.start_new_thread(lambda: uasyncio.run(self.run()), ())
 
 
-# class TestRegister:
+# class TestHandler:
+#     registers = {
+#         "a": 1,
+#         "b": 2,
+#         "c": 3
+#     }
 
-#     def __init__(self, name):
-#         self.name = name
-#         self.value = None
+#     def get_names(self):
+#         return self.registers.keys()
 
-#     def get_name(self):
-#         return self.name
-
-#     def get_meta(self):
+#     def get_meta(self, name):
 #         return {
-#             "device": "test"
+#             "device": "test",
+#             "title": "test register " + name
 #         }
 
-#     async def get_value(self):
-#         return self.value
+#     async def get_value(self, name):
+#         return self.registers[name]
 
-#     async def set_value(self, value):
-#         self.value = value
+#     async def set_value(self, name, value):
+#         self.registers[name] = value
 
 
-# testRegisters = (
-#     TestRegister('a'),
-#     TestRegister('b')
+# registry = mqtt_reg.Registry(
+#     TestHandler(),
+#     wifi_ssid=site_config.wifi_ssid,
+#     wifi_password=site_config.wifi_password,
+#     mqtt_broker=site_config.mqtt_broker,
+#     ledPin=4,
+#     debug=site_config.debug
 # )
+
+# registry.start()
