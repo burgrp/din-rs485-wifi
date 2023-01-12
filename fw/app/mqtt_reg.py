@@ -13,6 +13,8 @@ class Registry:
     def __init__(self, handler, wifi_ssid, wifi_password, mqtt_broker, ledPin=2, ledLogic=True, debug=False):
         self.handler = handler
         self.debug = debug
+        self.names = handler.get_names()
+
         mqtt_config = mqtt_as.config.copy()
         mqtt_config['ssid'] = wifi_ssid
         mqtt_config['wifi_pw'] = wifi_password
@@ -54,7 +56,10 @@ class Registry:
             self.advertise_in_progress = True
             try:
 
-                for name in self.handler.get_names():
+                if self.debug:
+                    print('Advertising registers')
+
+                for name in self.names:
                     meta = self.handler.get_meta(name)
                     await self.__publish_json('register/'+name+'/advertise', meta)
 
@@ -82,12 +87,9 @@ class Registry:
 
                 await subscribe('register/advertise!')
 
-                await subscribe('register/+/get')
-                await subscribe('register/+/set')
-
-                # for name in self.handler.get_names():
-                #     await subscribe('register/'+name+'/get')
-                #     await subscribe('register/'+name+'/set')
+                for name in self.names:
+                    await subscribe('register/'+name+'/get')
+                    await subscribe('register/'+name+'/set')
 
                 self.advertise_registers()
 
@@ -115,21 +117,26 @@ class Registry:
 
                         else:
 
-                            for name in self.handler.get_names():
+                            if topic.startswith('register/'):
 
-                                if topic == 'register/'+name+'/get':
+                                if topic.endswith('/get'):
+                                    name = topic[9:-4]
+                                    if self.debug:
+                                        print('Get', name)
                                     self.publish_register_value(name)
 
-                                if topic == 'register/'+name+'/set':
-                                    value = None if len(message) == 0 else ujson.load(uio.BytesIO(message.decode()))
-                                    self.handler.set_value(name, value)
-                                    self.publish_register_value(name)
+                                else:
+                                    if topic.endswith('/set'):
+                                        name = topic[9:-4]
+                                        value = None if len(message) == 0 else ujson.load(uio.BytesIO(message.decode()))
+                                        if self.debug:
+                                            print('Set', name, value)
+                                        self.handler.set_value(name, value)
+                                        self.publish_register_value(name)
 
                     except Exception as e:
                         if self.debug:
                             print('Error handling message because:', e)
-                else:
-                    print("RETAINED")
 
         await read_messages()
 
@@ -140,9 +147,9 @@ class Registry:
 
 # class TestHandler:
 #     registers = {
-#         "a": 1,
-#         "b": 2,
-#         "c": 3
+#         'a': 1,
+#         'b': 2,
+#         'c': 3
 #     }
 
 #     def get_names(self):
@@ -150,8 +157,8 @@ class Registry:
 
 #     def get_meta(self, name):
 #         return {
-#             "device": "test",
-#             "title": "test register " + name
+#             'device': 'test',
+#             'title': 'test register ' + name
 #         }
 
 #     def get_value(self, name):

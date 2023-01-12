@@ -36,6 +36,7 @@ class RegistryHandler:
         return {
             "device": "test",
             "title": self.registers[name].regdef.title,
+            "type": "number",
             "unit": self.registers[name].regdef.unit
         }
 
