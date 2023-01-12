@@ -1,4 +1,4 @@
-(kicad_sch (version 20221004) (generator eeschema)
+(kicad_sch (version 20221126) (generator eeschema)
 
   (uuid 32f9e9f8-9d15-4d51-acc1-705de5fd2b71)
 
@@ -336,7 +336,7 @@
       (property "Datasheet" "" (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
-      (property "ki_keywords" "power-flag" (at 0 0 0)
+      (property "ki_keywords" "global power" (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
       (property "ki_description" "Power symbol creates a global label with name \"+5V\"" (at 0 0 0)
@@ -388,7 +388,7 @@
       (property "Datasheet" "" (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
-      (property "ki_keywords" "power-flag" (at 0 0 0)
+      (property "ki_keywords" "global power" (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
       (property "ki_description" "Power symbol creates a global label with name \"GND\" , ground" (at 0 0 0)
@@ -497,7 +497,7 @@
     (instances
       (project "horizontal"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "U4") (unit 1) (value "PSU") (footprint "Drake:RQG 5V-0.6A-vertical")
+          (reference "U4") (unit 1)
         )
       )
     )
@@ -522,7 +522,7 @@
     (instances
       (project "horizontal"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR03") (unit 1) (value "GND") (footprint "")
+          (reference "#PWR03") (unit 1)
         )
       )
     )
@@ -549,7 +549,7 @@
     (instances
       (project "horizontal"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "J4") (unit 1) (value "RS485") (footprint "Drake:DG235-3.81-03P")
+          (reference "J4") (unit 1)
         )
       )
     )
@@ -574,25 +574,25 @@
     (instances
       (project "horizontal"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR0106") (unit 1) (value "+5V") (footprint "")
+          (reference "#PWR0106") (unit 1)
         )
       )
     )
   )
 
-  (symbol (lib_id "Connector:Conn_01x04_Female") (at 161.29 102.87 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+  (symbol (lib_id "Connector:Conn_01x04_Female") (at 161.29 105.41 0) (mirror x) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
     (uuid c0d61ea8-406c-4633-8bcb-b88474c5dc51)
-    (property "Reference" "J1" (at 162.0012 103.5455 0)
+    (property "Reference" "J1" (at 162.0012 104.7345 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "internal" (at 162.0012 105.3077 0)
+    (property "Value" "internal" (at 162.0012 102.9723 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical" (at 161.29 102.87 0)
+    (property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical" (at 161.29 105.41 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "Datasheet" "~" (at 161.29 102.87 0)
+    (property "Datasheet" "~" (at 161.29 105.41 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 66e27958-fc05-4e09-a6d7-8b6db7f5c4ed))
@@ -602,7 +602,7 @@
     (instances
       (project "horizontal"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "J1") (unit 1) (value "internal") (footprint "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical")
+          (reference "J1") (unit 1)
         )
       )
     )
@@ -628,7 +628,7 @@
     (instances
       (project "horizontal"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "J3") (unit 1) (value "Mains") (footprint "Drake:DG235-3.81-02P")
+          (reference "J3") (unit 1)
         )
       )
     )
@@ -654,13 +654,13 @@
     (instances
       (project "horizontal"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "RV1") (unit 1) (value "B72650M251K72") (footprint "Resistor_SMD:R_1210_3225Metric_Pad1.30x2.65mm_HandSolder")
+          (reference "RV1") (unit 1)
         )
       )
     )
   )
 
   (sheet_instances
-    (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71" (page "1"))
+    (path "/" (page "1"))
   )
 )
