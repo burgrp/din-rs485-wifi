@@ -1,4 +1,4 @@
-(kicad_sch (version 20221004) (generator eeschema)
+(kicad_sch (version 20221206) (generator eeschema)
 
   (uuid 32f9e9f8-9d15-4d51-acc1-705de5fd2b71)
 
@@ -1029,7 +1029,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR0102") (unit 1) (value "+5V") (footprint "")
+          (reference "#PWR0102") (unit 1)
         )
       )
     )
@@ -1055,7 +1055,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "C2") (unit 1) (value "47u") (footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder")
+          (reference "C2") (unit 1)
         )
       )
     )
@@ -1081,7 +1081,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "C1") (unit 1) (value "10u") (footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder")
+          (reference "C1") (unit 1)
         )
       )
     )
@@ -1107,7 +1107,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "C3") (unit 1) (value "47u") (footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder")
+          (reference "C3") (unit 1)
         )
       )
     )
@@ -1133,7 +1133,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "R3") (unit 1) (value "270R") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
+          (reference "R3") (unit 1)
         )
       )
     )
@@ -1158,7 +1158,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR01") (unit 1) (value "+3V3") (footprint "")
+          (reference "#PWR01") (unit 1)
         )
       )
     )
@@ -1184,7 +1184,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "D1") (unit 1) (value "LED") (footprint "LED_SMD:LED_2010_5025Metric")
+          (reference "D1") (unit 1)
         )
       )
     )
@@ -1216,7 +1216,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "U5") (unit 1) (value "MAX485E") (footprint "Package_SO:SO-8_3.9x4.9mm_P1.27mm")
+          (reference "U5") (unit 1)
         )
       )
     )
@@ -1241,7 +1241,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR05") (unit 1) (value "GND") (footprint "")
+          (reference "#PWR05") (unit 1)
         )
       )
     )
@@ -1268,7 +1268,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "U1") (unit 1) (value "LM1117-3.3") (footprint "Package_TO_SOT_SMD:SOT-223-3_TabPin2")
+          (reference "U1") (unit 1)
         )
       )
     )
@@ -1294,7 +1294,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "R1") (unit 1) (value "270R") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
+          (reference "R1") (unit 1)
         )
       )
     )
@@ -1321,7 +1321,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "J2") (unit 1) (value "PROG") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical")
+          (reference "J2") (unit 1)
         )
       )
     )
@@ -1347,7 +1347,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "R4") (unit 1) (value "270R") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
+          (reference "R4") (unit 1)
         )
       )
     )
@@ -1390,7 +1390,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "U2") (unit 1) (value "ESP32-C3-WROOM-02") (footprint "Espressif:ESP32-C3-WROOM-02")
+          (reference "U2") (unit 1)
         )
       )
     )
@@ -1415,7 +1415,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR04") (unit 1) (value "+3V3") (footprint "")
+          (reference "#PWR04") (unit 1)
         )
       )
     )
@@ -1440,7 +1440,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR0107") (unit 1) (value "GND") (footprint "")
+          (reference "#PWR0107") (unit 1)
         )
       )
     )
@@ -1466,25 +1466,25 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "R2") (unit 1) (value "270R") (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder")
+          (reference "R2") (unit 1)
         )
       )
     )
   )
 
-  (symbol (lib_id "Connector:Conn_01x04_Male") (at 189.23 128.27 180) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+  (symbol (lib_id "Connector:Conn_01x04_Male") (at 189.23 125.73 0) (mirror y) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
     (uuid 75a0659e-e5a9-46aa-b925-9e353bdb4c6f)
-    (property "Reference" "J1" (at 189.9412 126.4055 0)
+    (property "Reference" "J1" (at 189.9412 127.5945 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Value" "internal" (at 189.9412 128.1677 0)
+    (property "Value" "internal" (at 189.9412 125.8323 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Horizontal" (at 189.23 128.27 0)
+    (property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Horizontal" (at 189.23 125.73 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "Datasheet" "~" (at 189.23 128.27 0)
+    (property "Datasheet" "~" (at 189.23 125.73 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 16b1bdaa-42c8-45d3-b596-c3dd07301e1f))
@@ -1494,7 +1494,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "J1") (unit 1) (value "internal") (footprint "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Horizontal")
+          (reference "J1") (unit 1)
         )
       )
     )
@@ -1519,7 +1519,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR0105") (unit 1) (value "GND") (footprint "")
+          (reference "#PWR0105") (unit 1)
         )
       )
     )
@@ -1545,7 +1545,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "C8") (unit 1) (value "100n") (footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder")
+          (reference "C8") (unit 1)
         )
       )
     )
@@ -1570,7 +1570,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR0104") (unit 1) (value "GND") (footprint "")
+          (reference "#PWR0104") (unit 1)
         )
       )
     )
@@ -1595,7 +1595,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR02") (unit 1) (value "+3V3") (footprint "")
+          (reference "#PWR02") (unit 1)
         )
       )
     )
@@ -1620,7 +1620,7 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR0101") (unit 1) (value "+5V") (footprint "")
+          (reference "#PWR0101") (unit 1)
         )
       )
     )
@@ -1645,13 +1645,13 @@
     (instances
       (project "vertical"
         (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-          (reference "#PWR0103") (unit 1) (value "GND") (footprint "")
+          (reference "#PWR0103") (unit 1)
         )
       )
     )
   )
 
   (sheet_instances
-    (path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71" (page "1"))
+    (path "/" (page "1"))
   )
 )
