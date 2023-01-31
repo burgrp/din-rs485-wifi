@@ -4,3 +4,6 @@
 [submodule "fw/sub/micropython-modbus"]
 	path = fw/sub/micropython-modbus
 	url = https://gitlab.com/extel-open-source/micropython-modbus.git
+[submodule "fw/sub/micropython-mqtt-reg"]
+	path = fw/sub/micropython-mqtt-reg
+	url = git@github.com:burgrp/micropython-mqtt-reg.git

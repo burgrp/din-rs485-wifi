@@ -1,4 +1,15 @@
-wifi_ssid = '416T'
-wifi_password='????'
+from sinotimer_energy_meter_3p import *
+
+wifi_ssid = '???'
+wifi_password='???'
 mqtt_broker='10.1.0.12'
-debug=False
+debug=True
+devices=(
+    {
+        "name": "nanook",
+        "registers": SinotimerEnergyMeter3P,
+        "address": 1,
+        "baud": 9600
+    }
+)
+emu=False

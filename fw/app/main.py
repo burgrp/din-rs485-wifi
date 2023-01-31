@@ -1,8 +1,8 @@
-# from machine import UART
-# from modbus import modbus_rtu
-# import modbus
+from machine import UART, Pin
+from modbus import modbus_rtu
+import modbus
 import time
-# import struct
+import struct
 import mqtt_reg
 import uasyncio
 
@@ -17,7 +17,7 @@ class Register:
     def __init__(self, device, regdef):
         self.device = device
         self.regdef = regdef
-        self.value = 1
+        self.value = None
 
 class RegistryHandler:
 
@@ -25,8 +25,8 @@ class RegistryHandler:
 
     def __init__(self):
         for device in site_config.devices:
-            for regdef in device["registers"]:
-                name = device["name"] + "." + regdef.name
+            for regdef in device['registers']:
+                name = device['name'] + '.' + regdef.name
                 self.registers[name] = Register(device, regdef)
 
     def get_names(self):
@@ -34,10 +34,10 @@ class RegistryHandler:
 
     def get_meta(self, name):
         return {
-            "device": "test",
-            "title": self.registers[name].regdef.title,
-            "type": "number",
-            "unit": self.registers[name].regdef.unit
+            'device': 'test',
+            'title': self.registers[name].regdef.title,
+            'type': 'number',
+            'unit': self.registers[name].regdef.unit
         }
 
     def get_value(self, name):
@@ -46,9 +46,10 @@ class RegistryHandler:
     def set_value(self, name, value):
         self.registers[name].value = value
 
+registryHandler = RegistryHandler()
 
 registry = mqtt_reg.Registry(
-    RegistryHandler(),
+    registryHandler,
     wifi_ssid=site_config.wifi_ssid,
     wifi_password=site_config.wifi_password,
     mqtt_broker=site_config.mqtt_broker,
@@ -58,37 +59,43 @@ registry = mqtt_reg.Registry(
 
 registry.start()
 
-# txEn = Pin(3, Pin.OUT)
+txEn = Pin(3, Pin.OUT)
 
-# def serial_mode(mode):
-#     if mode == modbus_rtu.serial_cb_tx_begin:
-#         led.on()
-#         txEn.on()
-#     elif mode == modbus_rtu.serial_cb_tx_end:
-#         time.sleep(0.01)
-#         led.off()
-#         txEn.off()
+def serial_mode(mode):
+    if mode == modbus_rtu.serial_cb_tx_begin:
+        txEn.on()
+    elif mode == modbus_rtu.serial_cb_tx_end:
+        time.sleep(0.01)
+        txEn.off()
 
-# while True:
-#     for device in site_config.devices:
-#         print('Device:', device['address'], device['name'])
+while True:
+    for device in site_config.devices:
+        print('Device:', device['address'], device['name'])
 
-#         uart = UART(1, baudrate=device['baud'], tx=21, rx=20, timeout=1000, timeout_char=1000)
-#         master = modbus_rtu.RtuMaster(uart, serial_mode)
+        if not site_config.emu:
+            uart = UART(1, baudrate=device['baud'], tx=21, rx=20, timeout=1000, timeout_char=1000)
+            master = modbus_rtu.RtuMaster(uart, serial_mode)
 
-#         for register in registers:
-#             try:
-#                 if site_config.emu:
-#                     register.set(1)
-#                     time.sleep(0.1)
-#                 else:
-#                     f_word_pair = master.execute(device['address'], modbus.defines.READ_INPUT_REGISTERS, register.address, 2)
-#                     register.set(struct.unpack('<f', struct.pack('<h', int(f_word_pair[1])) + struct.pack('<h', int(f_word_pair[0])))[0])
+        for regdef in device['registers']:
 
-#             except Exception as e:
-#                 register.set(None)
-#                 print('error:', e)
+            value = None
 
-#             time.sleep(.1)
+            try:
+                if not site_config.emu:
+                    f_word_pair = master.execute(device['address'], modbus.defines.READ_INPUT_REGISTERS, regdef.address, 2)
+                    value = struct.unpack('<f', struct.pack('<h', int(f_word_pair[1])) + struct.pack('<h', int(f_word_pair[0])))[0]
+                else:
+                    time.sleep(0.1)
+                    value = 2
 
-#         uart.deinit()
+            except Exception as e:
+                print('error reading', regdef.name, ':', e)
+
+            name = device['name'] + '.' + regdef.name
+            print(name, '=', value)
+            registryHandler.registers[name].value = value
+
+            time.sleep(.1)
+
+        if not site_config.emu:
+            uart.deinit()
