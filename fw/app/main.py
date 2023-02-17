@@ -25,9 +25,38 @@ class RegistryHandler:
 
     def __init__(self):
         for device in site_config.devices:
+
+            print('Device', device['name'], 'at address', device['address'])
+
+            groups = []
+            group = []
+
+            def flush_group():
+                if len(group) > 0:
+                    groups.append(group.copy())
+                    group.clear()
+
+            last_addr = None
             for regdef in device['registers']:
                 name = device['name'] + '.' + regdef.name
                 self.registers[name] = Register(device, regdef)
+
+                group.append(regdef)
+
+                if last_addr != None and regdef.address > last_addr + 4:
+                    flush_group()
+
+                last_addr = regdef.address
+
+            flush_group()
+
+            device['groups'] = groups
+
+            for group in groups:
+                print(" group")
+                for regdef in group:
+                    print('  ', regdef.address, regdef.name, '"' + regdef.title + '"', regdef.unit)
+
 
     def get_names(self):
         return self.registers.keys()
@@ -70,32 +99,49 @@ def serial_mode(mode):
 
 while True:
     for device in site_config.devices:
-        print('Device:', device['address'], device['name'])
+
+        if site_config.debug:
+            print('Device:', device['address'], device['name'])
+
+        def set_value(regdef, value):
+            name = device['name'] + '.' + regdef.name
+            if site_config.debug:
+                print(name, '=', value)
+            registryHandler.registers[name].value = value
 
         if not site_config.emu:
             uart = UART(1, baudrate=device['baud'], tx=21, rx=20, timeout=1000, timeout_char=1000)
             master = modbus_rtu.RtuMaster(uart, serial_mode)
 
-        for regdef in device['registers']:
-
-            value = None
+        for group in device['groups']:
+            first_address = group[0].address
+            last_address = group[-1].address
 
             try:
+                words = None
+                word_count = 2 * (last_address - first_address + 1)
+
                 if not site_config.emu:
-                    f_word_pair = master.execute(device['address'], modbus.defines.READ_INPUT_REGISTERS, regdef.address, 2)
-                    value = struct.unpack('<f', struct.pack('<h', int(f_word_pair[1])) + struct.pack('<h', int(f_word_pair[0])))[0]
+                    words = master.execute(device['address'], modbus.defines.READ_INPUT_REGISTERS, first_address, word_count)
                 else:
+                    words = []
+                    for i in range(word_count):
+                        words.append(1)
                     time.sleep(0.1)
-                    value = 2
+
+                for regdef in group:
+                    offset = regdef.address - first_address
+                    value = struct.unpack('<f', struct.pack('<h', int(words[offset + 1])) + struct.pack('<h', int(words[offset + 0])))[0]
+                    set_value(regdef, value)
 
             except Exception as e:
-                print('error reading', regdef.name, ':', e)
+                print('error reading group data:', e)
+                for regdef in group:
+                    set_value(regdef, None)
+                time.sleep(1)
 
-            name = device['name'] + '.' + regdef.name
-            print(name, '=', value)
-            registryHandler.registers[name].value = value
-
-            time.sleep(.1)
 
         if not site_config.emu:
             uart.deinit()
+
+        time.sleep(1)
