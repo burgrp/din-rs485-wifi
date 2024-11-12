@@ -7,3 +7,6 @@
 [submodule "fw/sub/micropython-mqtt-reg"]
 	path = fw/sub/micropython-mqtt-reg
 	url = git@github.com:burgrp/micropython-mqtt-reg.git
+[submodule "fw/sub/mpy-builder-esp32c3"]
+	path = fw/sub/mpy-builder-esp32c3
+	url = git@github.com:burgrp/mpy-builder-esp32c3
