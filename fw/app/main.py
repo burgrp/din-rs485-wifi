@@ -10,6 +10,7 @@ import sys
 sys.path.append('/')
 
 import site_config
+import device_config
 
 print('MODBUS Energy Meter to WiFi bridge')
 
@@ -24,7 +25,7 @@ class RegistryHandler:
     registers = {}
 
     def __init__(self):
-        for device in site_config.devices:
+        for device in device_config.devices:
 
             print('Device', device['name'], 'at address', device['address'])
 
@@ -83,7 +84,7 @@ registry = mqtt_reg.Registry(
     wifi_password=site_config.wifi_password,
     mqtt_broker=site_config.mqtt_broker,
     ledPin=4,
-    debug=site_config.debug
+    debug=device_config.debug
 )
 
 registry.start()
@@ -98,18 +99,18 @@ def serial_mode(mode):
         txEn.off()
 
 while True:
-    for device in site_config.devices:
+    for device in device_config.devices:
 
-        if site_config.debug:
+        if device_config.debug:
             print('Device:', device['address'], device['name'])
 
         def set_value(regdef, value):
             name = device['name'] + '.' + regdef.name
-            if site_config.debug:
+            if device_config.debug:
                 print(name, '=', value)
             registryHandler.registers[name].value = value
 
-        if not site_config.emu:
+        if not device_config.emu:
             uart = UART(1, baudrate=device['baud'], tx=21, rx=20, timeout=1000, timeout_char=1000)
             master = modbus_rtu.RtuMaster(uart, serial_mode)
 
@@ -121,8 +122,20 @@ while True:
                 words = None
                 word_count = 2 * (last_address - first_address + 1)
 
-                if not site_config.emu:
-                    words = master.execute(device['address'], modbus.defines.READ_INPUT_REGISTERS, first_address, word_count)
+                if not device_config.emu:
+
+                    attempt = 0
+                    while True:
+                        attempt += 1
+                        try:
+                            words = master.execute(device['address'], modbus.defines.READ_INPUT_REGISTERS, first_address, word_count)
+                            break
+                        except Exception as e:
+                            if attempt >= 5:
+                                raise e
+                            print('error reading group data, retrying...')
+                            time.sleep(1)
+
                 else:
                     words = []
                     for i in range(word_count):
@@ -141,7 +154,9 @@ while True:
                 time.sleep(1)
 
 
-        if not site_config.emu:
+        if not device_config.emu:
             uart.deinit()
+            uart = None
+            master = None
 
         time.sleep(1)

@@ -1,8 +1,5 @@
 from sinotimer_energy_meter_3p import *
 
-wifi_ssid = '???'
-wifi_password='???'
-mqtt_broker='10.1.0.143'
 devices=(
     {
         "name": "em.grid",
