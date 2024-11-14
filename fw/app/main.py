@@ -14,80 +14,66 @@ import device_config
 
 print('MODBUS Energy Meter to WiFi bridge')
 
-class Register:
+class ModbusRegister(mqtt_reg.ServerReadOnlyRegister):
     def __init__(self, device, regdef):
-        self.device = device
-        self.regdef = regdef
+        super().__init__(
+            device['name'] + '.' + regdef.name,
+            {
+                    'device': device['name'],
+                    'title': regdef.title,
+                    'type': 'number',
+                    'unit': regdef.unit
+            }
+        )
         self.value = None
 
-class RegistryHandler:
+registers = {}
 
-    registers = {}
+for device in device_config.devices:
 
-    def __init__(self):
-        for device in device_config.devices:
+    print('Device', device['name'], 'at address', device['address'])
 
-            print('Device', device['name'], 'at address', device['address'])
+    groups = []
+    group = []
 
-            groups = []
-            group = []
+    def flush_group():
+        if len(group) > 0:
+            groups.append(group.copy())
+            group.clear()
 
-            def flush_group():
-                if len(group) > 0:
-                    groups.append(group.copy())
-                    group.clear()
+    last_addr = None
+    for regdef in device['registers']:
+        name = device['name'] + '.' + regdef.name
+        registers[name] = ModbusRegister(device, regdef)
 
-            last_addr = None
-            for regdef in device['registers']:
-                name = device['name'] + '.' + regdef.name
-                self.registers[name] = Register(device, regdef)
+        group.append(regdef)
 
-                group.append(regdef)
-
-                if last_addr != None and regdef.address > last_addr + 4:
-                    flush_group()
-
-                last_addr = regdef.address
-
+        if last_addr != None and regdef.address > last_addr + 4:
             flush_group()
 
-            device['groups'] = groups
+        last_addr = regdef.address
 
-            for group in groups:
-                print(" group")
-                for regdef in group:
-                    print('  ', regdef.address, regdef.name, '"' + regdef.title + '"', regdef.unit)
+    flush_group()
 
+    device['groups'] = groups
 
-    def get_names(self):
-        return self.registers.keys()
+    for group in groups:
+        print(" group")
+        for regdef in group:
+            print('  ', regdef.address, regdef.name, '"' + regdef.title + '"', regdef.unit)
 
-    def get_meta(self, name):
-        return {
-            'device': 'test',
-            'title': self.registers[name].regdef.title,
-            'type': 'number',
-            'unit': self.registers[name].regdef.unit
-        }
-
-    def get_value(self, name):
-        return self.registers[name].value
-
-    def set_value(self, name, value):
-        self.registers[name].value = value
-
-registryHandler = RegistryHandler()
+led = Pin(4, Pin.OUT)
 
 registry = mqtt_reg.Registry(
-    registryHandler,
     wifi_ssid=site_config.wifi_ssid,
     wifi_password=site_config.wifi_password,
     mqtt_broker=site_config.mqtt_broker,
-    ledPin=4,
+    server=list(registers.values()),
+    online_cb=lambda online: led.value(online),
     debug=device_config.debug
 )
 
-registry.start()
+registry.start(background=True)
 
 txEn = Pin(3, Pin.OUT)
 
@@ -108,7 +94,7 @@ while True:
             name = device['name'] + '.' + regdef.name
             if device_config.debug:
                 print(name, '=', value)
-            registryHandler.registers[name].value = value
+            registers[name].set_value_local(value)
 
         if not device_config.emu:
             uart = UART(1, baudrate=device['baud'], tx=21, rx=20, timeout=1000, timeout_char=1000)
