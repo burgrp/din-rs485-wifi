@@ -10,3 +10,9 @@
 [submodule "fw/sub/mpy-builder-esp32c3"]
 	path = fw/sub/mpy-builder-esp32c3
 	url = git@github.com:burgrp/mpy-builder-esp32c3
+[submodule "sub/kicad-libraries"]
+	path = sub/kicad-libraries
+	url = https://github.com/espressif/kicad-libraries.git
+[submodule "sub/hw-kicad"]
+	path = sub/hw-kicad
+	url = git@github.com:burgrp/hw-kicad.git
