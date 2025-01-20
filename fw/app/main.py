@@ -1,10 +1,11 @@
 from machine import UART, Pin
-from modbus import modbus_rtu
-import modbus
+from mb import ModbusRTUClient
 import time
 import struct
 import mqtt_reg
-import uasyncio
+import asyncio
+
+import micropython, gc
 
 import sys
 sys.path.append('/')
@@ -12,137 +13,122 @@ sys.path.append('/')
 import site_config
 import device_config
 
-print('MODBUS Energy Meter to WiFi bridge')
+async def main():
 
-class ModbusRegister(mqtt_reg.ServerReadOnlyRegister):
-    def __init__(self, device, regdef):
-        super().__init__(
-            device['name'] + '.' + regdef.name,
-            {
-                    'device': device['name'],
-                    'title': regdef.title,
-                    'type': 'number',
-                    'unit': regdef.unit
-            }
-        )
-        self.value = None
+    print('MODBUS Energy Meter to WiFi bridge')
 
-registers = {}
+    class ModbusRegister(mqtt_reg.ServerReadOnlyRegister):
+        def __init__(self, device, regdef):
+            super().__init__(
+                device['name'] + '.' + regdef.name,
+                {
+                        'device': device['name'],
+                        'title': regdef.title,
+                        'type': 'number',
+                        'unit': regdef.unit
+                }
+            )
+            self.value = None
 
-for device in device_config.devices:
+    registers = {}
 
-    print('Device', device['name'], 'at address', device['address'])
-
-    groups = []
-    group = []
-
-    def flush_group():
-        if len(group) > 0:
-            groups.append(group.copy())
-            group.clear()
-
-    last_addr = None
-    for regdef in device['registers']:
-        name = device['name'] + '.' + regdef.name
-        registers[name] = ModbusRegister(device, regdef)
-
-        group.append(regdef)
-
-        if last_addr != None and regdef.address > last_addr + 4:
-            flush_group()
-
-        last_addr = regdef.address
-
-    flush_group()
-
-    device['groups'] = groups
-
-    for group in groups:
-        print(" group")
-        for regdef in group:
-            print('  ', regdef.address, regdef.name, '"' + regdef.title + '"', regdef.unit)
-
-led = Pin(4, Pin.OUT)
-
-registry = mqtt_reg.Registry(
-    wifi_ssid=site_config.wifi_ssid,
-    wifi_password=site_config.wifi_password,
-    mqtt_broker=site_config.mqtt_broker,
-    server=list(registers.values()),
-    online_cb=lambda online: led.value(online),
-    debug=device_config.debug
-)
-
-registry.start(background=True)
-
-txEn = Pin(3, Pin.OUT)
-
-def serial_mode(mode):
-    if mode == modbus_rtu.serial_cb_tx_begin:
-        txEn.on()
-    elif mode == modbus_rtu.serial_cb_tx_end:
-        time.sleep(0.01)
-        txEn.off()
-
-while True:
     for device in device_config.devices:
 
-        if device_config.debug:
-            print('Device:', device['address'], device['name'])
+        print('Device', device['name'], 'at address', device['address'])
 
-        def set_value(regdef, value):
+        groups = []
+        group = []
+
+        def flush_group():
+            if len(group) > 0:
+                groups.append(group.copy())
+                group.clear()
+
+        last_addr = None
+        for regdef in device['registers']:
             name = device['name'] + '.' + regdef.name
-            if device_config.debug:
-                print(name, '=', value)
-            registers[name].set_value_local(value)
+            registers[name] = ModbusRegister(device, regdef)
 
-        if not device_config.emu:
-            uart = UART(1, baudrate=device['baud'], tx=21, rx=20, timeout=1000, timeout_char=1000)
-            master = modbus_rtu.RtuMaster(uart, serial_mode)
+            group.append(regdef)
 
-        for group in device['groups']:
-            first_address = group[0].address
-            last_address = group[-1].address
+            if last_addr != None and regdef.address > last_addr + 4:
+                flush_group()
 
-            try:
-                words = None
-                word_count = 2 * (last_address - first_address + 1)
+            last_addr = regdef.address
 
-                if not device_config.emu:
+        flush_group()
 
-                    attempt = 0
-                    while True:
-                        attempt += 1
-                        try:
-                            words = master.execute(device['address'], modbus.defines.READ_INPUT_REGISTERS, first_address, word_count)
-                            break
-                        except Exception as e:
-                            if attempt >= 5:
-                                raise e
-                            print('error reading group data, retrying...')
-                            time.sleep(1)
+        device['groups'] = groups
 
-                else:
-                    words = []
-                    for i in range(word_count):
-                        words.append(1)
-                    time.sleep(0.1)
+        for group in groups:
+            print(" group")
+            for regdef in group:
+                print('  ', regdef.address, regdef.name, '"' + regdef.title + '"', regdef.unit)
 
-                for regdef in group:
-                    offset = regdef.address - first_address
-                    value = struct.unpack('<f', struct.pack('<h', int(words[offset + 1])) + struct.pack('<h', int(words[offset + 0])))[0]
-                    set_value(regdef, value)
+    led = Pin(4, Pin.OUT)
 
-            except Exception as e:
-                print('error reading group data:', e)
-                for regdef in group:
-                    set_value(regdef, None)
-                time.sleep(1)
+    registry = mqtt_reg.Registry(
+        wifi_ssid=site_config.wifi_ssid,
+        wifi_password=site_config.wifi_password,
+        mqtt_broker=site_config.mqtt_broker,
+        server=list(registers.values()),
+        online_cb=lambda online: led.value(online),
+        debug=device_config.debug
+    )
+
+    registry.start()
+
+    master = ModbusRTUClient()
+
+    # while True:
+
+    #     micropython.mem_info()
+    #     print("Alloc:", gc.mem_alloc(), "Free:", gc.mem_free())
+
+    #     for device in device_config.devices:
+
+    #         if device_config.debug:
+    #             print('Device:', device['address'], device['name'])
+
+    #         def set_value(regdef, value):
+    #             name = device['name'] + '.' + regdef.name
+    #             if device_config.debug:
+    #                 print(name, '=', value)
+    #             registers[name].set_value_local(value)
 
 
-        if not device_config.emu:
-            uart.deinit()
-            uart = None
-            master = None
+    #         for group in device['groups']:
+    #             first_address = group[0].address
+    #             last_address = group[-1].address
 
-        time.sleep(1)
+    #             try:
+    #                 data = None
+
+    #                 attempt = 0
+    #                 while True:
+    #                     attempt += 1
+    #                     try:
+    #                         #data = await master.read_holding_registers(device['address'], start_addr=first_address, count=last_address - first_address + 2)
+    #                         break
+    #                     except Exception as e:
+    #                         if attempt >= 5:
+    #                             raise e
+    #                         print('error reading group data, retrying...')
+    #                         await asyncio.sleep(1)
+
+    #                 for regdef in group:
+    #                     offset = regdef.address - first_address
+    #                     value = struct.unpack('<f', struct.pack('<h', int(data[offset + 1])) + struct.pack('<h', int(data[offset + 0])))[0]
+    #                     set_value(regdef, value)
+
+    #             except Exception as e:
+    #                 print('error reading group data:', e)
+    #                 for regdef in group:
+    #                     set_value(regdef, None)
+    #                 await asyncio.sleep(1)
+
+    #         await asyncio.sleep(1)
+
+    await asyncio.sleep(10000)
+
+asyncio.run(main())
