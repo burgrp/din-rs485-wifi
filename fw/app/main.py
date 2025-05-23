@@ -97,7 +97,7 @@ while True:
             registers[name].set_value_local(value)
 
         if not device_config.emu:
-            uart = UART(1, baudrate=device['baud'], tx=21, rx=20, timeout=1000, timeout_char=1000)
+            uart = UART(1, baudrate=device['baud'], tx=21, rx=20, timeout=1000, timeout_char=200)
             master = modbus_rtu.RtuMaster(uart, serial_mode)
 
         for group in device['groups']:
