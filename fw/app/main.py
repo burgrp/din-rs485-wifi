@@ -84,6 +84,12 @@ def serial_mode(mode):
         time.sleep(0.01)
         txEn.off()
 
+def new_func(set_value, group, first_address, words):
+    for regdef in group:
+        offset = regdef.address - first_address
+        value = struct.unpack('<f', struct.pack('<h', int(words[offset + 1])) + struct.pack('<h', int(words[offset + 0])))[0]
+        set_value(regdef, value)
+
 while True:
     for device in device_config.devices:
 
@@ -128,10 +134,7 @@ while True:
                         words.append(1)
                     time.sleep(0.1)
 
-                for regdef in group:
-                    offset = regdef.address - first_address
-                    value = struct.unpack('<f', struct.pack('<h', int(words[offset + 1])) + struct.pack('<h', int(words[offset + 0])))[0]
-                    set_value(regdef, value)
+                new_func(set_value, group, first_address, words)
 
             except Exception as e:
                 print('error reading group data:', e)
