@@ -1,4 +1,5 @@
 (sym_lib_table
   (version 7)
-  (lib (name "Espressif")(type "KiCad")(uri "${KIPRJMOD}/../sub/kicad-libraries/symbols/Espressif.kicad_sym")(options "")(descr ""))
+  (lib (name "Drake")(type "KiCad")(uri "${KIPRJMOD}/../sub/hw-kicad/Drake.kicad_sym")(options "")(descr ""))
+  (lib (name "MCU_Puya_PY32F")(type "KiCad")(uri "${KIPRJMOD}/../sub/hw-kicad/MCU_Puya_PY32F.kicad_sym")(options "")(descr ""))
 )
