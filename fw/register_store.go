@@ -1,32 +1,36 @@
 package main
 
-// regValue is intentionally integer-only for BleRiot wire model.
-type regValue struct {
-	value int32
-	valid bool
-}
+const maxWireTag = 64
 
 type registerStore struct {
-	byTag map[uint8]regValue
+	values [maxWireTag + 1]int32
+	valid  [maxWireTag + 1]bool
+	used   [maxWireTag + 1]bool
 }
 
 func newRegisterStore() *registerStore {
-	return &registerStore{byTag: make(map[uint8]regValue, 64)}
+	return &registerStore{}
 }
 
 func (s *registerStore) SetByTag(tag uint8, value int32, valid bool) bool {
-	cur, ok := s.byTag[tag]
-	if ok && cur.value == value && cur.valid == valid {
+	if int(tag) > maxWireTag {
 		return false
 	}
-	s.byTag[tag] = regValue{value: value, valid: valid}
+	if s.used[tag] && s.values[tag] == value && s.valid[tag] == valid {
+		return false
+	}
+	s.values[tag] = value
+	s.valid[tag] = valid
+	s.used[tag] = true
 	return true
 }
 
-func (s *registerStore) Snapshot() map[uint8]regValue {
-	out := make(map[uint8]regValue, len(s.byTag))
-	for k, v := range s.byTag {
-		out[k] = v
+func (s *registerStore) GetByTag(tag uint8) (value int32, valid bool, ok bool) {
+	if int(tag) > maxWireTag {
+		return 0, false, false
 	}
-	return out
+	if !s.used[tag] {
+		return 0, false, false
+	}
+	return s.values[tag], s.valid[tag], true
 }

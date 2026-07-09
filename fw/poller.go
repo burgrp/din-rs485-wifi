@@ -23,6 +23,11 @@ type regGroup struct {
 	regs  []spec.RegDef
 }
 
+type groupedDevice struct {
+	slaveAddr uint8
+	groups    []regGroup
+}
+
 // groupRegs mirrors the existing Python grouping heuristic: keep contiguous-ish spans.
 func groupRegs(in []spec.RegDef) []regGroup {
 	if len(in) == 0 {
@@ -57,14 +62,17 @@ func newPoller(client ModbusClient, writer RegisterWriter, retries int) *poller 
 	return &poller{client: client, writer: writer, retries: retries}
 }
 
-func (p *poller) pollDevice(dev spec.DeviceDef) {
-	groups := groupRegs(dev.Registers)
-	for _, g := range groups {
+func newGroupedDevice(dev spec.DeviceDef) groupedDevice {
+	return groupedDevice{slaveAddr: dev.SlaveAddr, groups: groupRegs(dev.Registers)}
+}
+
+func (p *poller) pollDevice(dev groupedDevice) {
+	for _, g := range dev.groups {
 		wordCount := 2 * int(g.last-g.first+1)
 		var words []uint16
 		var err error
 		for i := 0; i < p.retries; i++ {
-			words, err = p.client.ReadInputRegisters(dev.SlaveAddr, g.first, uint16(wordCount))
+			words, err = p.client.ReadInputRegisters(dev.slaveAddr, g.first, uint16(wordCount))
 			if err == nil {
 				break
 			}

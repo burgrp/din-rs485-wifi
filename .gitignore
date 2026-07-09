@@ -3,3 +3,7 @@
 _autosave*
 *.lck
 production
+
+# fw firmware build artifacts
+fw/image.elf
+fw/size-report.html

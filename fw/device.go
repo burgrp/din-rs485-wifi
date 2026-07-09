@@ -12,8 +12,8 @@ type runtimeDevice struct {
 
 func newRuntimeDevice() *runtimeDevice {
 	d := &runtimeDevice{store: newRegisterStore()}
-	for i := range spec.AllRegisters {
-		d.store.SetByTag(spec.AllRegisters[i].Tag, 0, false)
+	for _, reg := range spec.RegistersForSlots(2) {
+		d.store.SetByTag(reg.Tag, 0, false)
 	}
 	return d
 }
@@ -23,11 +23,11 @@ func (d *runtimeDevice) bindNode(n *node.Node) {
 }
 
 func (d *runtimeDevice) Read(tag uint16) (value int32, null bool) {
-	v, ok := d.store.byTag[uint8(tag)]
-	if !ok || !v.valid {
+	v, valid, ok := d.store.GetByTag(uint8(tag))
+	if !ok || !valid {
 		return 0, true
 	}
-	return v.value, false
+	return v, false
 }
 
 func (d *runtimeDevice) Write(tag uint16, value int32, null bool) {

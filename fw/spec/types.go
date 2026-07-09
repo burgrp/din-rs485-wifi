@@ -4,18 +4,18 @@ import "github.com/burgrp/bleriot/lib/shared/inventory"
 
 // Config is persisted in the provisioning page and read by firmware on boot.
 type Config struct {
-	GridAddr  uint8
-	HouseAddr uint8
-	PollMs    uint16
-	Baud      uint32
+	SlaveAddr1 uint8
+	SlaveAddr2 uint8
+	PollMs     uint16
+	Baud       uint32
 }
 
 func DefaultConfig() Config {
 	return Config{
-		GridAddr:  1,
-		HouseAddr: 2,
-		PollMs:    1000,
-		Baud:      9600,
+		SlaveAddr1: 1,
+		SlaveAddr2: 2,
+		PollMs:     1000,
+		Baud:       9600,
 	}
 }
 
@@ -31,7 +31,6 @@ type RegDef struct {
 
 // DeviceDef describes one RS485 slave to poll.
 type DeviceDef struct {
-	Name      string
 	SlaveAddr uint8
 	Baud      uint32
 	Registers []RegDef
@@ -52,10 +51,17 @@ type NodeConfig struct {
 
 var Chip = inventory.PY32F003x6
 
-func Type() inventory.DeviceType {
-	regs := make([]inventory.Register, 0, len(AllRegisters))
-	for i := range AllRegisters {
-		reg := AllRegisters[i]
+func TypeForGroups(groups []string) inventory.DeviceType {
+	groupSlots := make([]GroupSlot, 0, len(groups))
+	for i := range groups {
+		groupSlots = append(groupSlots, GroupSlot{Group: groups[i], Slot: uint8(i)})
+	}
+	return TypeForGroupSlots(groupSlots)
+}
+
+func TypeForGroupSlots(groupSlots []GroupSlot) inventory.DeviceType {
+	regs := make([]inventory.Register, 0, len(RegistersForGroupSlots(groupSlots)))
+	for _, reg := range RegistersForGroupSlots(groupSlots) {
 		divider := reg.ScaleMilli
 		if divider <= 0 {
 			divider = 1

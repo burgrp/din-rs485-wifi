@@ -51,9 +51,10 @@ func main() {
 		bridgeCfg.PollMs = 1000
 	}
 
-	devices := []spec.DeviceDef{
-		{Name: "em.grid", SlaveAddr: bridgeCfg.GridAddr, Baud: bridgeCfg.Baud, Registers: spec.GridRegisters},
-		{Name: "em.house", SlaveAddr: bridgeCfg.HouseAddr, Baud: bridgeCfg.Baud, Registers: spec.HouseRegisters},
+	devices := configuredDevices(bridgeCfg)
+	grouped := make([]groupedDevice, len(devices))
+	for i := range devices {
+		grouped[i] = newGroupedDevice(devices[i])
 	}
 
 	client, err := newUARTRS485Client(pins, bridgeCfg.Baud)
@@ -64,8 +65,8 @@ func main() {
 
 	go func() {
 		for {
-			for i := range devices {
-				poll.pollDevice(devices[i])
+			for i := range grouped {
+				poll.pollDevice(grouped[i])
 			}
 			time.Sleep(time.Duration(bridgeCfg.PollMs) * time.Millisecond)
 		}
@@ -80,21 +81,32 @@ func main() {
 func decodeBridgeConfig(raw []byte) spec.Config {
 	cfg := spec.DefaultConfig()
 	if len(raw) >= 8 {
-		cfg.GridAddr = raw[0]
-		cfg.HouseAddr = raw[1]
+		cfg.SlaveAddr1 = raw[0]
+		cfg.SlaveAddr2 = raw[1]
 		cfg.PollMs = binary.LittleEndian.Uint16(raw[2:4])
 		cfg.Baud = binary.LittleEndian.Uint32(raw[4:8])
 	}
-	if cfg.GridAddr == 0 {
-		cfg.GridAddr = 1
+	if cfg.SlaveAddr1 == 0 {
+		cfg.SlaveAddr1 = 1
 	}
-	if cfg.HouseAddr == 0 {
-		cfg.HouseAddr = 2
+	if cfg.SlaveAddr2 == 0 {
+		cfg.SlaveAddr2 = 2
 	}
 	if cfg.Baud == 0 {
 		cfg.Baud = 9600
 	}
 	return cfg
+}
+
+func configuredDevices(cfg spec.Config) []spec.DeviceDef {
+	devices := make([]spec.DeviceDef, 0, 2)
+	if cfg.SlaveAddr1 != 0 {
+		devices = append(devices, spec.DeviceDef{SlaveAddr: cfg.SlaveAddr1, Baud: cfg.Baud, Registers: spec.RegistersForMeterSlot(0)})
+	}
+	if cfg.SlaveAddr2 != 0 {
+		devices = append(devices, spec.DeviceDef{SlaveAddr: cfg.SlaveAddr2, Baud: cfg.Baud, Registers: spec.RegistersForMeterSlot(1)})
+	}
+	return devices
 }
 
 func haltBlink(led machine.Pin, period time.Duration) {
