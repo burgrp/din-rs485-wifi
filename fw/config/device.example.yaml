@@ -1,0 +1,46 @@
+device_type: din.rs485.energy.v1
+
+node:
+  uid: "0x0102030405060708"
+  xtea_key: "00112233445566778899aabbccddeeff"
+  pins:
+    rs485_tx: PA0
+    rs485_rx: PA3
+    rs485_txen: PA5
+    led: PB0
+    rf_data: PA1
+    rf_sck: PA2
+    rf_cs: PA4
+    debug: PA7
+  poll_ms: 1000
+  read_retries: 5
+
+devices:
+  - name: em.grid
+    slave_addr: 1
+    baud: 9600
+    model: sinotimer_3p
+  - name: em.house
+    slave_addr: 2
+    baud: 9600
+    model: sinotimer_3p
+
+register_map:
+  - tag: 0x1000
+    name: voltage.1
+    title: Voltage L1
+    unit: V
+    address: 0x0000
+    scale_milli: 1000
+  - tag: 0x1001
+    name: voltage.2
+    title: Voltage L2
+    unit: V
+    address: 0x0002
+    scale_milli: 1000
+  - tag: 0x1002
+    name: voltage.3
+    title: Voltage L3
+    unit: V
+    address: 0x0004
+    scale_milli: 1000

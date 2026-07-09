@@ -1,4 +1,43 @@
-PROJECT_NAME=rs485-wifi
-PORT=/dev/ttyACM0
+# RS485 node firmware (flat package main split by tinygo build tags).
+# Mirrors the BleRiot example Makefile style.
 
-include sub/mpy-builder-esp32c3/micropython.mk
+TARGET_TINYGO ?= py32f003_32k_4k
+TARGET_PYOCD  ?= py32f003x6
+CMSIS_PACK    ?= PY32F003
+
+IMAGE = image.elf
+
+.PHONY: build flash gdb rtt install-pack disassembly new provision hub test
+
+build:
+	tinygo build --stack-size 1024b --size html --serial rtt --scheduler tasks -print-allocs=. --gc leaking --target ${TARGET_TINYGO} -o ${IMAGE} .
+
+flash: build
+	pkill pyocd || true
+	sleep 1
+	pyocd load -t ${TARGET_PYOCD} ${IMAGE}
+	pyocd rtt -t ${TARGET_PYOCD}
+
+gdb:
+	pyocd gdb --target ${TARGET_PYOCD} --semihosting --persist
+
+rtt:
+	pyocd rtt -t ${TARGET_PYOCD}
+
+install-pack:
+	pyocd pack install ${CMSIS_PACK}
+
+disassembly: build
+	arm-none-eabi-objdump -dS ${IMAGE} > disassembly.txt
+
+new:
+	go run . new
+
+provision:
+	go run . provision
+
+hub:
+	go run . hub --diagnostics rf
+
+test:
+	go test ./...
