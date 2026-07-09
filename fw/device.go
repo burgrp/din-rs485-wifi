@@ -11,11 +11,7 @@ type runtimeDevice struct {
 }
 
 func newRuntimeDevice() *runtimeDevice {
-	d := &runtimeDevice{store: newRegisterStore()}
-	for _, reg := range spec.RegistersForSlots(2) {
-		d.store.SetByTag(reg.Tag, 0, false)
-	}
-	return d
+	return &runtimeDevice{store: newRegisterStore(spec.MaxTagForSlots(2))}
 }
 
 func (d *runtimeDevice) bindNode(n *node.Node) {

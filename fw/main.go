@@ -13,36 +13,36 @@ import (
 	"github.com/burgrp/din-rs485-wifi/fw/spec"
 )
 
+const (
+	rs485TxPin   = machine.PA0
+	rs485RxPin   = machine.PA3
+	rs485TxEnPin = machine.PA5
+	statusLedPin = machine.PB0
+	debugPin     = machine.PA7
+	rfDataPin    = machine.PA1
+	rfSckPin     = machine.PA2
+	rfCsPin      = machine.PA4
+	readRetries  = 5
+)
+
 // Command (firmware) main wires the RS485 bridge device to the BleRiot runtime.
 func main() {
-	pins := boardConfig()
 	dev := newRuntimeDevice()
 
-	ledPin, err := pinByName(pins.LedPin)
-	if err == nil {
-		ledPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
-		ledPin.High()
-	}
+	led := statusLedPin
+	led.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	led.High()
 
-	rfSck, err := pinByName(pins.RFSckPin)
-	if err != nil {
-		haltBlink(ledPin, 100*time.Millisecond)
-	}
-	rfData, err := pinByName(pins.RFDataPin)
-	if err != nil {
-		haltBlink(ledPin, 100*time.Millisecond)
-	}
-	rfCs, err := pinByName(pins.RFCsPin)
-	if err != nil {
-		haltBlink(ledPin, 100*time.Millisecond)
-	}
+	rfSck := rfSckPin
+	rfData := rfDataPin
+	rfCs := rfCsPin
 
 	n, cfgBytes, err := pan211x.StartNode(&spec.Chip, rfSck, rfData, rfCs, dev)
 	if err != nil {
 		if config.IsUnprovisioned(err) {
-			haltBlink(ledPin, 1000*time.Millisecond)
+			haltBlink(led, 1000*time.Millisecond)
 		}
-		haltBlink(ledPin, 100*time.Millisecond)
+		haltBlink(led, 100*time.Millisecond)
 	}
 	dev.bindNode(n)
 
@@ -57,11 +57,11 @@ func main() {
 		grouped[i] = newGroupedDevice(devices[i])
 	}
 
-	client, err := newUARTRS485Client(pins, bridgeCfg.Baud)
+	client, err := newUARTRS485Client(bridgeCfg.Baud)
 	if err != nil {
-		haltBlink(ledPin, 200*time.Millisecond)
+		haltBlink(led, 200*time.Millisecond)
 	}
-	poll := newPoller(client, dev, pins.ReadRetries)
+	poll := newPoller(client, dev, readRetries)
 
 	go func() {
 		for {

@@ -1,5 +1,7 @@
 package spec
 
+const maxWireTag = 255
+
 // Keep tags stable once deployed. Do not renumber shipped tags.
 const (
 	TagVoltageL1 uint8 = iota + 1
@@ -53,10 +55,26 @@ func RegistersPerMeter() uint8 {
 	return uint8(len(EnergyMeterRegisters))
 }
 
+// MaxTagForSlots returns the highest wire tag required for count meter slots.
+// It avoids building temporary register slices during firmware startup.
+func MaxTagForSlots(count uint8) uint8 {
+	if count == 0 {
+		return 0
+	}
+	maxBaseTag := uint8(0)
+	for i := range EnergyMeterRegisters {
+		if EnergyMeterRegisters[i].Tag > maxBaseTag {
+			maxBaseTag = EnergyMeterRegisters[i].Tag
+		}
+	}
+	offset := mustTagOffsetForSlot(count-1, len(EnergyMeterRegisters))
+	return addTagOffset(maxBaseTag, offset)
+}
+
 // RegistersForMeterSlot returns the register map for one RS485 meter slot.
-// slot=0 uses base tags; slot=1 is offset by RegistersPerMeter(), etc.
+// slot=0 uses base tags; later slots get deterministic offsets.
 func RegistersForMeterSlot(slot uint8) []RegDef {
-	return registersForSlot(slot, "")
+	return registersForTagOffset(mustTagOffsetForSlot(slot, len(EnergyMeterRegisters)), "")
 }
 
 func RegistersForSlots(count uint8) []RegDef {
@@ -73,6 +91,15 @@ type GroupSlot struct {
 	Slot  uint8
 }
 
+// GroupBinding explicitly maps a hub-side group name to a slot and a tag offset.
+// TagOffset decouples wire-tag layout from a specific register definition size,
+// which is useful when mixing different RS485 device types.
+type GroupBinding struct {
+	Group     string
+	Slot      uint8
+	TagOffset uint8
+}
+
 // RegistersForGroups builds host-visible register definitions for multiple hub-side groups.
 // Group names are prefixed to base names, e.g. "grid" + "voltage.1" -> "grid.voltage.1".
 func RegistersForGroups(groups []string) []RegDef {
@@ -82,7 +109,8 @@ func RegistersForGroups(groups []string) []RegDef {
 		if prefix != "" {
 			prefix += "."
 		}
-		out = append(out, registersForSlot(uint8(i), prefix)...)
+		offset := mustTagOffsetForSlot(uint8(i), len(EnergyMeterRegisters))
+		out = append(out, registersForTagOffset(offset, prefix)...)
 	}
 	return out
 }
@@ -95,21 +123,51 @@ func RegistersForGroupSlots(groups []GroupSlot) []RegDef {
 		if prefix != "" {
 			prefix += "."
 		}
-		out = append(out, registersForSlot(groups[i].Slot, prefix)...)
+		offset := mustTagOffsetForSlot(groups[i].Slot, len(EnergyMeterRegisters))
+		out = append(out, registersForTagOffset(offset, prefix)...)
 	}
 	return out
 }
 
-func registersForSlot(slot uint8, namePrefix string) []RegDef {
+// RegistersForGroupBindings builds host-visible register definitions with explicit tag offsets.
+// Use this when different RS485 device types are combined under one bridge device type.
+func RegistersForGroupBindings(groups []GroupBinding) []RegDef {
+	out := make([]RegDef, 0, len(EnergyMeterRegisters)*len(groups))
+	for i := range groups {
+		prefix := groups[i].Group
+		if prefix != "" {
+			prefix += "."
+		}
+		out = append(out, registersForTagOffset(groups[i].TagOffset, prefix)...)
+	}
+	return out
+}
+
+func registersForTagOffset(tagOffset uint8, namePrefix string) []RegDef {
 	out := make([]RegDef, len(EnergyMeterRegisters))
-	offset := uint16(slot) * uint16(len(EnergyMeterRegisters))
 	for i := range EnergyMeterRegisters {
 		reg := EnergyMeterRegisters[i]
-		reg.Tag = uint8(uint16(reg.Tag) + offset)
+		reg.Tag = addTagOffset(reg.Tag, tagOffset)
 		if namePrefix != "" {
 			reg.Name = namePrefix + reg.Name
 		}
 		out[i] = reg
 	}
 	return out
+}
+
+func addTagOffset(tag, tagOffset uint8) uint8 {
+	sum := uint16(tag) + uint16(tagOffset)
+	if sum > maxWireTag {
+		panic("register tag overflow")
+	}
+	return uint8(sum)
+}
+
+func mustTagOffsetForSlot(slot uint8, regsPerSlave int) uint8 {
+	offset := int(slot) * regsPerSlave
+	if offset > maxWireTag {
+		panic("slot tag offset overflow")
+	}
+	return uint8(offset)
 }
