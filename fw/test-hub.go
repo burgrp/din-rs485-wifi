@@ -12,8 +12,8 @@ import (
 
 var channel = inventory.Channel{Name: "far", Number: 37, SpreadFactor: config.SpreadFactorS8}
 var slaves = []spec.Slave{
-	{Group: "grid", Addr: 1, Sel: 1, Device: spec.SinotimerEnergyMeter3P},
-	{Group: "house", Addr: 2, Sel: 2, Device: spec.SinotimerEnergyMeter3P},
+	{Group: "grid", Addr: 1, TagRegion: 1, Device: spec.SinotimerEnergyMeter3P},
+	{Group: "house", Addr: 2, TagRegion: 2, Device: spec.SinotimerEnergyMeter3P},
 }
 
 func main() {

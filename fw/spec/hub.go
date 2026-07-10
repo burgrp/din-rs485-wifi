@@ -24,13 +24,13 @@ type Device struct {
 }
 
 // Slave maps a hub-side group name to a physical RS485 slave (Modbus address),
-// a wire-tag selector, and the Modbus device type wired to that slave. Mixing
+// a wire-tag region, and the Modbus device type wired to that slave. Mixing
 // device types is supported: each slave carries its own register table.
 type Slave struct {
-	Group  string
-	Addr   uint8
-	Sel    uint8
-	Device *Device
+	Group     string
+	Addr      uint8
+	TagRegion uint8
+	Device    *Device
 }
 
 // runs compresses a device's register table into packed contiguous runs
@@ -79,7 +79,7 @@ func ConfigForSlaves(slaves []Slave, pollMs uint16) Config {
 			rng = [2]uint8{uint8(start), uint8(len(runs))}
 			ranges[sl.Device] = rng
 		}
-		cfg.Slaves[i] = SlaveCfg{Addr: sl.Addr, Sel: sl.Sel, Span: MakeSpan(rng[0], rng[1])}
+		cfg.Slaves[i] = SlaveCfg{Addr: sl.Addr, TagRegion: sl.TagRegion, Span: MakeSpan(rng[0], rng[1])}
 	}
 	for i := range pool {
 		cfg.Runs[i] = pool[i]
@@ -88,7 +88,7 @@ func ConfigForSlaves(slaves []Slave, pollMs uint16) Config {
 }
 
 // TypeForSlaves builds the hub-visible device type. Each register's wire tag is
-// TagFor(slave.Sel, address); names are prefixed with the group, e.g.
+// TagFor(slave.TagRegion, address); names are prefixed with the group, e.g.
 // "grid.voltage.1". Every register uses the uniform WireScaleMilli divider.
 func TypeForSlaves(slaves []Slave) inventory.DeviceType {
 	total := 0
@@ -109,7 +109,7 @@ func TypeForSlaves(slaves []Slave) inventory.DeviceType {
 				md["unit"] = m.Unit
 			}
 			regs = append(regs, inventory.Register{
-				Tag:        TagFor(sl.Sel, m.Address),
+				Tag:        TagFor(sl.TagRegion, m.Address),
 				Name:       prefix + m.Name,
 				Type:       inventory.TypeFloat,
 				Multiplier: 1,

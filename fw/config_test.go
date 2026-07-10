@@ -34,8 +34,8 @@ func pageImageLen(t *testing.T, cfg spec.Config) int {
 
 func TestConfigFitsPage(t *testing.T) {
 	slaves := []spec.Slave{
-		{Group: "grid", Addr: 1, Sel: 1, Device: spec.SinotimerEnergyMeter3P},
-		{Group: "house", Addr: 2, Sel: 2, Device: spec.SinotimerEnergyMeter3P},
+		{Group: "grid", Addr: 1, TagRegion: 1, Device: spec.SinotimerEnergyMeter3P},
+		{Group: "house", Addr: 2, TagRegion: 2, Device: spec.SinotimerEnergyMeter3P},
 	}
 	cfg := spec.ConfigForSlaves(slaves, 1000)
 
@@ -56,8 +56,8 @@ func TestConfigFitsPage(t *testing.T) {
 
 func TestTwoIdenticalMetersShareRunPool(t *testing.T) {
 	slaves := []spec.Slave{
-		{Group: "grid", Addr: 1, Sel: 1, Device: spec.SinotimerEnergyMeter3P},
-		{Group: "house", Addr: 2, Sel: 2, Device: spec.SinotimerEnergyMeter3P},
+		{Group: "grid", Addr: 1, TagRegion: 1, Device: spec.SinotimerEnergyMeter3P},
+		{Group: "house", Addr: 2, TagRegion: 2, Device: spec.SinotimerEnergyMeter3P},
 	}
 	cfg := spec.ConfigForSlaves(slaves, 1000)
 	if cfg.Slaves[0].Span != cfg.Slaves[1].Span {
@@ -70,8 +70,8 @@ func TestTwoIdenticalMetersShareRunPool(t *testing.T) {
 
 func TestMixedDeviceTypes(t *testing.T) {
 	slaves := []spec.Slave{
-		{Group: "grid", Addr: 1, Sel: 1, Device: spec.SinotimerEnergyMeter3P},
-		{Group: "aux", Addr: 3, Sel: 2, Device: smallDevice},
+		{Group: "grid", Addr: 1, TagRegion: 1, Device: spec.SinotimerEnergyMeter3P},
+		{Group: "aux", Addr: 3, TagRegion: 2, Device: smallDevice},
 	}
 	cfg := spec.ConfigForSlaves(slaves, 1000)
 	if cfg.Slaves[0].Span == cfg.Slaves[1].Span {
@@ -83,7 +83,7 @@ func TestMixedDeviceTypes(t *testing.T) {
 	assertRoundTrip(t, cfg)
 	assertPlanRegs(t, cfg, len(spec.SinotimerEnergyMeter3P.Registers)+len(smallDevice.Registers))
 
-	// The aux slave's tags must use selector 2 and its own addresses.
+	// The aux slave's tags must use tag region 2 and its own addresses.
 	typ := spec.TypeForSlaves(slaves)
 	wantAux := spec.TagFor(2, 0x0002)
 	found := false

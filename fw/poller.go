@@ -14,10 +14,10 @@ type ModbusClient interface {
 }
 
 // runPlan is one Modbus read: Count float32 registers starting at BaseAddr on
-// slaveAddr, whose results map onto wire tags via sel.
+// slaveAddr, whose results map onto wire tags via region.
 type runPlan struct {
 	slaveAddr uint8
-	sel       uint8
+	region    uint8
 	baseAddr  uint16
 	count     uint8
 }
@@ -30,7 +30,7 @@ func buildPlan(cfg spec.Config) []runPlan {
 	plan := make([]runPlan, 0, spec.MaxSlaves*spec.MaxRuns)
 	for s := range cfg.Slaves {
 		sl := cfg.Slaves[s]
-		if sl.Addr == 0 || sl.Sel == 0 {
+		if sl.Addr == 0 || sl.TagRegion == 0 {
 			continue
 		}
 		start := int(sl.RunStart())
@@ -42,7 +42,7 @@ func buildPlan(cfg spec.Config) []runPlan {
 			}
 			plan = append(plan, runPlan{
 				slaveAddr: sl.Addr,
-				sel:       sl.Sel,
+				region:    sl.TagRegion,
 				baseAddr:  run.Addr(),
 				count:     run.Count(),
 			})
@@ -69,7 +69,7 @@ func decodeConfig(raw []byte) spec.Config {
 	}
 	for i := 0; i < spec.MaxSlaves; i++ {
 		cfg.Slaves[i].Addr = raw[o]
-		cfg.Slaves[i].Sel = raw[o+1]
+		cfg.Slaves[i].TagRegion = raw[o+1]
 		cfg.Slaves[i].Span = raw[o+2]
 		o += 3
 	}

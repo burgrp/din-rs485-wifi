@@ -33,7 +33,7 @@ func (d *runtimeDevice) configure(plan []runPlan) {
 		p := plan[i]
 		for j := uint8(0); j < p.count; j++ {
 			addr := p.baseAddr + uint16(j)*2
-			d.tags = append(d.tags, spec.TagFor(p.sel, addr))
+			d.tags = append(d.tags, spec.TagFor(p.region, addr))
 		}
 	}
 }

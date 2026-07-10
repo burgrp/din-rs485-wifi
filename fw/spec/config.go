@@ -13,9 +13,9 @@ const (
 	MaxRuns   = 10
 	MaxSlaves = 2
 
-	// tagAddrBits splits the 16-bit wire tag into a slave selector and a Modbus
-	// word address: tag = sel<<tagAddrBits | addr. 12 address bits cover the
-	// full 0..4095 register range; 4 selector bits cover slaves 1..15.
+	// tagAddrBits splits the 16-bit wire tag into a slave-scoped region and a
+	// Modbus word address: tag = region<<tagAddrBits | addr. 12 address bits
+	// cover the full 0..4095 register range; 4 region bits cover slaves 1..15.
 	tagAddrBits = 12
 	tagAddrMask = uint16(1)<<tagAddrBits - 1
 
@@ -53,13 +53,13 @@ func (r Run) Addr() uint16 { return uint16(r) >> runCountBits }
 // Count returns the number of float32 registers in the run.
 func (r Run) Count() uint8 { return uint8(uint16(r) & runCountMask) }
 
-// SlaveCfg binds an RS485 Modbus slave to a tag selector and a slice of the
+// SlaveCfg binds an RS485 Modbus slave to a tag region and a slice of the
 // shared run pool. Addr == 0 marks the slot unused.
 type SlaveCfg struct {
 	// Addr is the RS485 Modbus slave address to poll (0 = slot unused).
 	Addr uint8
-	// Sel is the wire-tag selector (1..15) for this slave's registers.
-	Sel uint8
+	// TagRegion is the wire-tag region (1..15) for this slave's registers.
+	TagRegion uint8
 	// Span packs the slave's run slice: high nibble = first run index, low
 	// nibble = run count. Use RunStart / RunCount to read it.
 	Span uint8
@@ -86,8 +86,8 @@ type Config struct {
 	Slaves [MaxSlaves]SlaveCfg
 }
 
-// TagFor encodes a slave selector and a Modbus word address into a wire tag.
-// sel must be 1..15 (0 is reserved by the protocol as RegAll).
-func TagFor(sel uint8, addr uint16) uint16 {
-	return uint16(sel)<<tagAddrBits | (addr & tagAddrMask)
+// TagFor encodes a slave tag region and a Modbus word address into a wire tag.
+// region must be 1..15 (0 is reserved by the protocol as RegAll).
+func TagFor(region uint8, addr uint16) uint16 {
+	return uint16(region)<<tagAddrBits | (addr & tagAddrMask)
 }
