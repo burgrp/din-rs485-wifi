@@ -5,13 +5,37 @@ import (
 	"github.com/burgrp/din-rs485-wifi/fw/spec"
 )
 
+// runtimeDevice implements node.Device. It holds a flat, config-ordered table
+// of wire tags and their last-known values. It has no meter knowledge: tags are
+// computed purely from the poll plan via spec.TagFor.
 type runtimeDevice struct {
-	store *registerStore
-	node  *node.Node
+	tags   []uint16
+	values []int32
+	valid  []bool
+	node   *node.Node
 }
 
 func newRuntimeDevice() *runtimeDevice {
-	return &runtimeDevice{store: newRegisterStore(spec.MaxTagForSlots(2))}
+	return &runtimeDevice{}
+}
+
+// configure sizes the register table from the poll plan. The tag order must
+// match the poller's iteration order so poll results can be written by index.
+func (d *runtimeDevice) configure(plan []runPlan) {
+	n := 0
+	for i := range plan {
+		n += int(plan[i].count)
+	}
+	d.tags = make([]uint16, 0, n)
+	d.values = make([]int32, n)
+	d.valid = make([]bool, n)
+	for i := range plan {
+		p := plan[i]
+		for j := uint8(0); j < p.count; j++ {
+			addr := p.baseAddr + uint16(j)*2
+			d.tags = append(d.tags, spec.TagFor(p.sel, addr))
+		}
+	}
 }
 
 func (d *runtimeDevice) bindNode(n *node.Node) {
@@ -19,24 +43,32 @@ func (d *runtimeDevice) bindNode(n *node.Node) {
 }
 
 func (d *runtimeDevice) Read(tag uint16) (value int32, null bool) {
-	v, valid, ok := d.store.GetByTag(uint8(tag))
-	if !ok || !valid {
-		return 0, true
+	for i := range d.tags {
+		if d.tags[i] == tag {
+			if !d.valid[i] {
+				return 0, true
+			}
+			return d.values[i], false
+		}
 	}
-	return v, false
+	return 0, true
 }
 
 func (d *runtimeDevice) Write(tag uint16, value int32, null bool) {
-	_ = tag
-	_ = value
-	_ = null
 	// All bridged Modbus registers are read-only from the RF side.
 }
 
-func (d *runtimeDevice) SetByTag(tag uint8, value int32, valid bool) {
-	changed := d.store.SetByTag(tag, value, valid)
-	if !changed || d.node == nil {
+// set records a polled value by table index and notifies the hub on change.
+func (d *runtimeDevice) set(idx int, value int32, valid bool) {
+	if idx < 0 || idx >= len(d.values) {
 		return
 	}
-	d.node.Notify(uint16(tag), value, !valid)
+	if d.values[idx] == value && d.valid[idx] == valid {
+		return
+	}
+	d.values[idx] = value
+	d.valid[idx] = valid
+	if d.node != nil {
+		d.node.Notify(d.tags[idx], value, !valid)
+	}
 }

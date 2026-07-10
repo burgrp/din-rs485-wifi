@@ -3,7 +3,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"machine"
 	"runtime"
 	"time"
@@ -22,10 +21,15 @@ const (
 	rfDataPin    = machine.PA1
 	rfSckPin     = machine.PA2
 	rfCsPin      = machine.PA4
-	readRetries  = 5
+
+	readRetries   = 5
+	modbusBaud    = 9600
+	defaultPollMs = 1000
 )
 
-// Command (firmware) main wires the RS485 bridge device to the BleRiot runtime.
+// Command (firmware) main wires the generic RS485 bridge device to the BleRiot
+// runtime. All meter semantics live on the hub; the device only polls the
+// Modbus addresses named in its provisioned Config and notifies encoded tags.
 func main() {
 	dev := newRuntimeDevice()
 
@@ -33,11 +37,7 @@ func main() {
 	led.Configure(machine.PinConfig{Mode: machine.PinOutput})
 	led.High()
 
-	rfSck := rfSckPin
-	rfData := rfDataPin
-	rfCs := rfCsPin
-
-	n, cfgBytes, err := pan211x.StartNode(&spec.Chip, rfSck, rfData, rfCs, dev)
+	n, cfgBytes, err := pan211x.StartNode(&spec.Chip, rfSckPin, rfDataPin, rfCsPin, dev)
 	if err != nil {
 		if config.IsUnprovisioned(err) {
 			haltBlink(led, 1000*time.Millisecond)
@@ -46,29 +46,25 @@ func main() {
 	}
 	dev.bindNode(n)
 
-	bridgeCfg := decodeBridgeConfig(cfgBytes)
-	if bridgeCfg.PollMs == 0 {
-		bridgeCfg.PollMs = 1000
+	cfg := decodeConfig(cfgBytes)
+	pollMs := cfg.PollMs
+	if pollMs == 0 {
+		pollMs = defaultPollMs
 	}
 
-	devices := configuredDevices(bridgeCfg)
-	grouped := make([]groupedDevice, len(devices))
-	for i := range devices {
-		grouped[i] = newGroupedDevice(devices[i])
-	}
+	plan := buildPlan(cfg)
+	dev.configure(plan)
 
-	client, err := newUARTRS485Client(bridgeCfg.Baud)
+	client, err := newUARTRS485Client(modbusBaud)
 	if err != nil {
 		haltBlink(led, 200*time.Millisecond)
 	}
-	poll := newPoller(client, dev, readRetries)
+	poll := newPoller(client, dev, plan, readRetries)
 
 	go func() {
 		for {
-			for i := range grouped {
-				poll.pollDevice(grouped[i])
-			}
-			time.Sleep(time.Duration(bridgeCfg.PollMs) * time.Millisecond)
+			poll.pollAll()
+			time.Sleep(time.Duration(pollMs) * time.Millisecond)
 		}
 	}()
 
@@ -76,37 +72,6 @@ func main() {
 		n.Poll()
 		runtime.Gosched()
 	}
-}
-
-func decodeBridgeConfig(raw []byte) spec.Config {
-	cfg := spec.DefaultConfig()
-	if len(raw) >= 8 {
-		cfg.SlaveAddr1 = raw[0]
-		cfg.SlaveAddr2 = raw[1]
-		cfg.PollMs = binary.LittleEndian.Uint16(raw[2:4])
-		cfg.Baud = binary.LittleEndian.Uint32(raw[4:8])
-	}
-	if cfg.SlaveAddr1 == 0 {
-		cfg.SlaveAddr1 = 1
-	}
-	if cfg.SlaveAddr2 == 0 {
-		cfg.SlaveAddr2 = 2
-	}
-	if cfg.Baud == 0 {
-		cfg.Baud = 9600
-	}
-	return cfg
-}
-
-func configuredDevices(cfg spec.Config) []spec.DeviceDef {
-	devices := make([]spec.DeviceDef, 0, 2)
-	if cfg.SlaveAddr1 != 0 {
-		devices = append(devices, spec.DeviceDef{SlaveAddr: cfg.SlaveAddr1, Baud: cfg.Baud, Registers: spec.RegistersForMeterSlot(0)})
-	}
-	if cfg.SlaveAddr2 != 0 {
-		devices = append(devices, spec.DeviceDef{SlaveAddr: cfg.SlaveAddr2, Baud: cfg.Baud, Registers: spec.RegistersForMeterSlot(1)})
-	}
-	return devices
 }
 
 func haltBlink(led machine.Pin, period time.Duration) {
