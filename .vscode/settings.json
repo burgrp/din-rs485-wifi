@@ -1,0 +1,8 @@
+{
+    "go.toolsEnvVars": {
+        "GOOS": "linux",
+        "GOARCH": "arm",
+        "GOROOT": "/home/paul/.cache/tinygo/goroot-12e864b5dab76cb7888a8e703fcedaa3da8e4bf33686518ebe5bff20d8c39160",
+        "GOFLAGS": "-tags=cortexm,baremetal,linux,arm,py32,py32f003xx,tinygo,purego,osusergo,math_big_pure_go,gc.none,scheduler.none,serial.none,tinygo.unicore"
+    }
+}
