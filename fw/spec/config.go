@@ -76,7 +76,7 @@ func (s SlaveCfg) RunCount() uint8 { return s.Span & 0x0F }
 
 // Config is the fixed-size provisioning payload persisted in the flash page.
 // It carries no meter semantics: only which Modbus addresses to poll on which
-// slaves, and how the results map onto wire tags via Sel.
+// slaves, and how the results map onto wire tags via TagRegion.
 //
 // Layout (little-endian, no padding): PollMs(2) + Runs(10*2=20) +
 // Slaves(2*3=6) = 28 bytes.

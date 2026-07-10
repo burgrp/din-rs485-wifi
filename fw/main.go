@@ -9,6 +9,7 @@ import (
 
 	"github.com/burgrp/bleriot/lib/node/pan211x"
 	"github.com/burgrp/bleriot/lib/shared/config"
+	"github.com/burgrp/din-rs485-wifi/fw/rs485"
 	"github.com/burgrp/din-rs485-wifi/fw/spec"
 )
 
@@ -55,7 +56,12 @@ func main() {
 	plan := buildPlan(cfg)
 	dev.configure(plan)
 
-	client, err := newUARTRS485Client(modbusBaud)
+	client, err := rs485.New(rs485.Config{
+		TX:   rs485TxPin,
+		RX:   rs485RxPin,
+		TxEn: rs485TxEnPin,
+		Baud: modbusBaud,
+	})
 	if err != nil {
 		haltBlink(led, 200*time.Millisecond)
 	}

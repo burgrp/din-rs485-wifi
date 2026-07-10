@@ -1,6 +1,9 @@
 //go:build tinygo
 
-package main
+// Package rs485 implements a minimal Modbus-RTU master over a half-duplex
+// RS485 UART. It is board-agnostic: pins, baud rate and timing are supplied
+// through Config, so the same client can be reused by different firmware.
+package rs485
 
 import (
 	"errors"
@@ -9,7 +12,39 @@ import (
 	_ "unsafe"
 )
 
-type uartRS485Client struct {
+// Default frame timing, applied by New when a Config field is left zero.
+const (
+	defaultTxSettle    = 2 * time.Millisecond
+	defaultRxFirstByte = 120 * time.Millisecond
+	defaultRxInterByte = 15 * time.Millisecond
+)
+
+// Config describes the RS485 wiring and timing for a Client.
+type Config struct {
+	// UART is the hardware UART to drive. If nil, machine.DefaultUART is used.
+	UART *machine.UART
+	// TX and RX are the UART data pins.
+	TX machine.Pin
+	RX machine.Pin
+	// TxEn drives the transceiver's DE/RE direction control (active-high while
+	// transmitting).
+	TxEn machine.Pin
+	// Baud is the serial bit rate (e.g. 9600).
+	Baud uint32
+	// TxSettle is the guard time held before and after driving the bus. Zero
+	// selects defaultTxSettle.
+	TxSettle time.Duration
+	// RxFirstByte is how long to wait for the first response byte. Zero selects
+	// defaultRxFirstByte.
+	RxFirstByte time.Duration
+	// RxInterByte is the idle gap that ends a response frame. Zero selects
+	// defaultRxInterByte.
+	RxInterByte time.Duration
+}
+
+// Client is a half-duplex RS485 Modbus-RTU master. It is not safe for
+// concurrent use; drive it from a single goroutine.
+type Client struct {
 	uart        *machine.UART
 	txEn        machine.Pin
 	txSettle    time.Duration
@@ -21,31 +56,43 @@ type uartRS485Client struct {
 	wordsBuf    [125]uint16
 }
 
-func newUARTRS485Client(baud uint32) (*uartRS485Client, error) {
-	txPin := rs485TxPin
-	rxPin := rs485RxPin
-	txEnPin := rs485TxEnPin
+// New configures the UART and direction pin and returns a ready Client.
+func New(cfg Config) (*Client, error) {
+	txEn := cfg.TxEn
+	txEn.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	txEn.Low()
 
-	txEnPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	txEnPin.Low()
-
-	u := machine.DefaultUART
+	u := cfg.UART
+	if u == nil {
+		u = machine.DefaultUART
+	}
 	u.Configure(machine.UARTConfig{
-		TX:       txPin,
-		RX:       rxPin,
-		BaudRate: baud,
+		TX:       cfg.TX,
+		RX:       cfg.RX,
+		BaudRate: cfg.Baud,
 	})
 
-	return &uartRS485Client{
+	c := &Client{
 		uart:        u,
-		txEn:        txEnPin,
-		txSettle:    2 * time.Millisecond,
-		rxFirstByte: 120 * time.Millisecond,
-		rxInterByte: 15 * time.Millisecond,
-	}, nil
+		txEn:        txEn,
+		txSettle:    cfg.TxSettle,
+		rxFirstByte: cfg.RxFirstByte,
+		rxInterByte: cfg.RxInterByte,
+	}
+	if c.txSettle == 0 {
+		c.txSettle = defaultTxSettle
+	}
+	if c.rxFirstByte == 0 {
+		c.rxFirstByte = defaultRxFirstByte
+	}
+	if c.rxInterByte == 0 {
+		c.rxInterByte = defaultRxInterByte
+	}
+	return c, nil
 }
 
-func (c *uartRS485Client) ReadInputRegisters(slave uint8, start uint16, qty uint16) ([]uint16, error) {
+// ReadInputRegisters issues Modbus function 0x04 and returns qty 16-bit words.
+func (c *Client) ReadInputRegisters(slave uint8, start uint16, qty uint16) ([]uint16, error) {
 	if qty == 0 {
 		return nil, errors.New("qty must be > 0")
 	}
@@ -108,7 +155,7 @@ func (c *uartRS485Client) ReadInputRegisters(slave uint8, start uint16, qty uint
 	return words, nil
 }
 
-func (c *uartRS485Client) flushRX() {
+func (c *Client) flushRX() {
 	for {
 		n, _ := c.uart.Read(c.rxScratch[:])
 		if n == 0 {
@@ -117,7 +164,7 @@ func (c *uartRS485Client) flushRX() {
 	}
 }
 
-func (c *uartRS485Client) readFrame(expected int, firstTimeout time.Duration, nextTimeout time.Duration) ([]byte, error) {
+func (c *Client) readFrame(expected int, firstTimeout time.Duration, nextTimeout time.Duration) ([]byte, error) {
 	if expected > len(c.rxFrame) {
 		return nil, errors.New("response too large")
 	}
