@@ -1,9 +1,14 @@
 # RS485 node firmware (flat package main split by tinygo build tags).
 # Mirrors the BleRiot example Makefile style.
 
-TARGET_TINYGO ?= py32f003_32k_4k
-TARGET_PYOCD  ?= py32f003x6
-CMSIS_PACK    ?= PY32F003
+# TARGET_TINYGO ?= py32f003_32k_4k
+# TARGET_PYOCD  ?= py32f003x6
+# CMSIS_PACK    ?= PY32F003
+
+TARGET_TINYGO = py32f030_64k_8k
+TARGET_PYOCD = py32f030x8
+CMSIS_PACK = PY32F030
+
 
 IMAGE = image.elf
 

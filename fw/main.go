@@ -9,6 +9,7 @@ import (
 
 	"github.com/burgrp/bleriot/lib/node/pan211x"
 	"github.com/burgrp/bleriot/lib/shared/config"
+	"github.com/burgrp/din-rs485-wifi/fw/rs485"
 	"github.com/burgrp/din-rs485-wifi/fw/spec"
 )
 
@@ -25,9 +26,12 @@ const (
 
 	// --- Pin mapping: BOB breakout board (PY32F030 + PAN211x) ---
 	// RF and LED pins follow bleriot/example/bob and the bob schematic; the
-	// RS485 UART uses USART1 (PA2/PA3) with DE/RE and debug on free header GPIO.
+	// RS485 UART uses USART1 on PA2/PA3 (both AF1) with DE/RE and debug on free
+	// header GPIO. See PY32F030 datasheet, port-A AF map (PA2=USART1_TX/AF1,
+	// PA3=USART1_RX/AF1).
 	rs485TxPin   = machine.PA2  // USART1_TX (header)
 	rs485RxPin   = machine.PA3  // USART1_RX (header)
+	rs485UartAF  = 1            // USART1 alternate function for PA2/PA3
 	rs485TxEnPin = machine.PA4  // RS485 DE/RE direction (header GPIO)
 	statusLedPin = machine.PB0  // red LED
 	debugPin     = machine.PA6  // header GPIO
@@ -68,23 +72,33 @@ func main() {
 	plan := buildPlan(cfg)
 	dev.configure(plan)
 
-	// client, err := rs485.New(rs485.Config{
-	// 	TX:   rs485TxPin,
-	// 	RX:   rs485RxPin,
-	// 	TxEn: rs485TxEnPin,
-	// 	Baud: modbusBaud,
-	// })
-	// if err != nil {
-	// 	haltBlink(led, 200*time.Millisecond)
-	// }
-	// poll := newPoller(client, dev, plan, readRetries)
+	client, err := rs485.New(rs485.Config{
+		TX:      rs485TxPin,
+		RX:      rs485RxPin,
+		AltFunc: rs485UartAF,
+		TxEn:    rs485TxEnPin,
+		Baud:    modbusBaud,
+	})
+	if err != nil {
+		haltBlink(led, 200*time.Millisecond)
+	}
+	poll := newPoller(client, dev, plan, readRetries)
 
-	// go func() {
-	// 	for {
-	// 		poll.pollAll()
-	// 		time.Sleep(time.Duration(pollMs) * time.Millisecond)
-	// 	}
-	// }()
+	pollMs = 20
+	println("poll ms", pollMs)
+
+	go func() {
+		for {
+			ms := runtime.MemStats{}
+			runtime.ReadMemStats(&ms)
+			println("mem", ms.HeapAlloc)
+			statusLedPin.Set(!statusLedPin.Get())
+
+			poll.pollAll()
+			time.Sleep(time.Duration(pollMs) * time.Millisecond)
+
+		}
+	}()
 
 	for {
 		n.Poll()

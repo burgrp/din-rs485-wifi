@@ -19,6 +19,22 @@ const (
 	defaultRxInterByte = 15 * time.Millisecond
 )
 
+// Sentinel errors. These are package-level so the hot read path never calls
+// errors.New, which would allocate on every failed poll (fatal under the
+// leaking GC).
+var (
+	errQtyZero       = errors.New("qty must be > 0")
+	errQtyTooLarge   = errors.New("qty exceeds modbus limit")
+	errShortResponse = errors.New("short response")
+	errSlaveID       = errors.New("unexpected slave id")
+	errException     = errors.New("modbus exception response")
+	errFuncCode      = errors.New("unexpected function code")
+	errByteCount     = errors.New("byte count mismatch")
+	errCRC           = errors.New("crc mismatch")
+	errResponseLarge = errors.New("response too large")
+	errTimeout       = errors.New("timeout waiting response")
+)
+
 // Config describes the RS485 wiring and timing for a Client.
 type Config struct {
 	// UART is the hardware UART to drive. If nil, machine.DefaultUART is used.
@@ -26,6 +42,11 @@ type Config struct {
 	// TX and RX are the UART data pins.
 	TX machine.Pin
 	RX machine.Pin
+	// AltFunc is the GPIO alternate-function number that routes the USART to
+	// the TX/RX pins (e.g. AF1 for PA2/PA3 = USART1 on PY32F030). The TinyGo
+	// py32 UART driver does not route the peripheral to pins itself, so New
+	// selects this alternate function on both TX and RX explicitly.
+	AltFunc uint8
 	// TxEn drives the transceiver's DE/RE direction control (active-high while
 	// transmitting).
 	TxEn machine.Pin
@@ -72,6 +93,13 @@ func New(cfg Config) (*Client, error) {
 		BaudRate: cfg.Baud,
 	})
 
+	// The py32 UART.Configure does not map USART1 onto the requested pins, so
+	// route TX and RX to the peripheral via their alternate function here.
+	cfg.TX.Configure(machine.PinConfig{Mode: machine.PinAlternate})
+	cfg.TX.SetAltFunc(cfg.AltFunc)
+	cfg.RX.Configure(machine.PinConfig{Mode: machine.PinAlternate})
+	cfg.RX.SetAltFunc(cfg.AltFunc)
+
 	c := &Client{
 		uart:        u,
 		txEn:        txEn,
@@ -94,10 +122,10 @@ func New(cfg Config) (*Client, error) {
 // ReadInputRegisters issues Modbus function 0x04 and returns qty 16-bit words.
 func (c *Client) ReadInputRegisters(slave uint8, start uint16, qty uint16) ([]uint16, error) {
 	if qty == 0 {
-		return nil, errors.New("qty must be > 0")
+		return nil, errQtyZero
 	}
 	if qty > 125 {
-		return nil, errors.New("qty exceeds modbus limit")
+		return nil, errQtyTooLarge
 	}
 
 	c.txFrame[0] = slave
@@ -124,25 +152,25 @@ func (c *Client) ReadInputRegisters(slave uint8, start uint16, qty uint16) ([]ui
 	}
 
 	if len(resp) != respLen {
-		return nil, errors.New("short response")
+		return nil, errShortResponse
 	}
 	if resp[0] != slave {
-		return nil, errors.New("unexpected slave id")
+		return nil, errSlaveID
 	}
 	if resp[1] == 0x84 {
-		return nil, errors.New("modbus exception response")
+		return nil, errException
 	}
 	if resp[1] != 0x04 {
-		return nil, errors.New("unexpected function code")
+		return nil, errFuncCode
 	}
 	if int(resp[2]) != int(qty)*2 {
-		return nil, errors.New("byte count mismatch")
+		return nil, errByteCount
 	}
 
 	gotCRC := uint16(resp[len(resp)-2]) | (uint16(resp[len(resp)-1]) << 8)
 	calcCRC := modbusCRC16(resp[:len(resp)-2])
 	if gotCRC != calcCRC {
-		return nil, errors.New("crc mismatch")
+		return nil, errCRC
 	}
 
 	words := c.wordsBuf[:qty]
@@ -166,7 +194,7 @@ func (c *Client) flushRX() {
 
 func (c *Client) readFrame(expected int, firstTimeout time.Duration, nextTimeout time.Duration) ([]byte, error) {
 	if expected > len(c.rxFrame) {
-		return nil, errors.New("response too large")
+		return nil, errResponseLarge
 	}
 	buf := c.rxFrame[:expected]
 	total := 0
@@ -184,7 +212,7 @@ func (c *Client) readFrame(expected int, firstTimeout time.Duration, nextTimeout
 		time.Sleep(250 * time.Microsecond)
 	}
 	if total < expected {
-		return buf[:total], errors.New("timeout waiting response")
+		return buf[:total], errTimeout
 	}
 	return buf, nil
 }

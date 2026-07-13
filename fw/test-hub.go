@@ -24,7 +24,7 @@ func main() {
 			Key:     [16]byte{0x63, 0x03, 0xF1, 0x7F, 0x54, 0x7C, 0xE6, 0x94, 0x70, 0xB2, 0x75, 0xD4, 0xB1, 0xA0, 0x65, 0x8E},
 			Channel: channel,
 			Type:    spec.TypeForSlaves(slaves),
-			Config:  spec.ConfigForSlaves(slaves, 1000),
+			Config:  spec.ConfigForSlaves(slaves, 100),
 		},
 	})
 }
