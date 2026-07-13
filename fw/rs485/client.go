@@ -19,12 +19,22 @@ const (
 	defaultRxInterByte = 15 * time.Millisecond
 )
 
+// Buffer sizing. The Modbus wire protocol allows up to 125 words per read, but
+// this firmware never requests more than 30 (MaxRunCount=15 float32 registers,
+// 2 words each). The receive buffers are sized for that application limit to
+// save RAM under the leaking GC; raise maxWords if a caller needs larger reads.
+const (
+	maxWords = 30
+	// maxFrame is the largest response frame: slave+func+bytecount + data + CRC.
+	maxFrame = 5 + maxWords*2
+)
+
 // Sentinel errors. These are package-level so the hot read path never calls
 // errors.New, which would allocate on every failed poll (fatal under the
 // leaking GC).
 var (
 	errQtyZero       = errors.New("qty must be > 0")
-	errQtyTooLarge   = errors.New("qty exceeds modbus limit")
+	errQtyTooLarge   = errors.New("qty exceeds buffer limit")
 	errShortResponse = errors.New("short response")
 	errSlaveID       = errors.New("unexpected slave id")
 	errException     = errors.New("modbus exception response")
@@ -73,8 +83,8 @@ type Client struct {
 	rxInterByte time.Duration
 	txFrame     [8]byte
 	rxScratch   [64]byte
-	rxFrame     [255]byte
-	wordsBuf    [125]uint16
+	rxFrame     [maxFrame]byte
+	wordsBuf    [maxWords]uint16
 }
 
 // New configures the UART and direction pin and returns a ready Client.
@@ -124,7 +134,7 @@ func (c *Client) ReadInputRegisters(slave uint8, start uint16, qty uint16) ([]ui
 	if qty == 0 {
 		return nil, errQtyZero
 	}
-	if qty > 125 {
+	if qty > maxWords {
 		return nil, errQtyTooLarge
 	}
 
