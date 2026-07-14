@@ -5,5 +5,5 @@ _autosave*
 production
 
 # fw firmware build artifacts
-fw/image.elf
+fw/*.elf
 fw/size-report.html

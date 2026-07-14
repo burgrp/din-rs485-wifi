@@ -1,27 +1,29 @@
-# RS485 node firmware (flat package main split by tinygo build tags).
+# RS485 node firmware. One firmware per device, sharing the uartline transport
+# and rig runtime. Select which one with CMD (meter or bms).
 # Mirrors the BleRiot example Makefile style.
 
-# TARGET_TINYGO ?= py32f003_32k_4k
-# TARGET_PYOCD  ?= py32f003x6
-# CMSIS_PACK    ?= PY32F003
+# TARGET_TINYGO ?= py32f030_64k_8k
+# TARGET_PYOCD  ?= py32f030x8
+# CMSIS_PACK    ?= PY32F030
 
-TARGET_TINYGO = py32f030_64k_8k
-TARGET_PYOCD = py32f030x8
-CMSIS_PACK = PY32F030
+TARGET_TINYGO = py32f003_32k_4k
+TARGET_PYOCD = py32f003x6
+CMSIS_PACK = PY32F003
 
+# Firmware to build/flash/provision: meter | bms
+CMD ?= meter
 
-IMAGE = image.elf
+IMAGE = ${CMD}.elf
 
 .PHONY: build flash gdb rtt install-pack disassembly new provision hub test
 
 build:
-	tinygo build --stack-size 1024b --size html --serial rtt --scheduler tasks -print-allocs=. --gc leaking --target ${TARGET_TINYGO} -o ${IMAGE} .
+	tinygo build --stack-size 1024b --size html --serial uart --scheduler tasks -print-allocs=. --gc leaking --target ${TARGET_TINYGO} -o ${IMAGE} ./${CMD}
 
 flash: build
 	pkill pyocd || true
 	sleep 1
 	pyocd load -t ${TARGET_PYOCD} ${IMAGE}
-	pyocd rtt -t ${TARGET_PYOCD}
 
 gdb:
 	pyocd gdb --target ${TARGET_PYOCD} --semihosting --persist
