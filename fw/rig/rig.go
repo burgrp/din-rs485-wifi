@@ -1,10 +1,10 @@
 //go:build tinygo
 
 // Package rig is the shared node runtime for the DIN RS485 boards. It owns the
-// fixed BOB pin mapping, the BleRiot node lifecycle and the poll loop, so each
-// device firmware only supplies a Source: which tags it exposes and how to
-// poll them. One node drives one slave, so there is no addressing map to
-// decode; the only runtime knob is the poll interval.
+// fixed vertical-board pin mapping, the BleRiot node lifecycle and the poll
+// loop, so each device firmware only supplies a Source: which tags it exposes
+// and how to poll them. One node drives one slave, so there is no addressing
+// map to decode; the only runtime knob is the poll interval.
 package rig
 
 import (
@@ -17,23 +17,25 @@ import (
 	"github.com/burgrp/din-rs485-wifi/fw/spec"
 )
 
-// BOB breakout board (PY32F030 + PAN211x) pin mapping. The debug console lives
-// on USART1 (BOB's PROG-header UART, PB6/PB7, AF0) so a USB-serial adapter on
-// that header shows the `--serial uart` log. The RS485 bus runs on USART2
-// (PA2/PA3, AF4) with DE/RE on PA4. The RF and LED pins follow
-// bleriot/example/bob. See the PY32F030/F003 datasheet port-A/port-B AF maps
-// (PA2=USART2_TX/AF4, PA3=USART2_RX/AF4, PB6=USART1_TX/AF0, PB7=USART1_RX/AF0).
+// Vertical board (PY32F003W1xSx SOP16 + PAN211x) pin mapping. The RS485 bus runs
+// on USART2 (TX PA0/AF9, RX PA3/AF4) with DE/RE on PA5; TX and RX need different
+// alternate functions because PA0 only exposes USART2_TX on AF9. The debug
+// console lives on USART1_TX (PA7, AF8) so a USB-serial adapter shows the
+// `--serial uart` log. The PAN211x radio uses a bit-banged SPI on plain GPIO,
+// and the status LED is on PB0. See the PY32F003 datasheet port-A AF table
+// (PA0=USART2_TX/AF9, PA3=USART2_RX/AF4, PA7=USART1_TX/AF8).
 const (
-	UartTx  = machine.PA2  // USART2_TX (breakout header)
-	UartRx  = machine.PA3  // USART2_RX (breakout header)
-	UartAF  = 4            // USART2 alternate function for PA2/PA3
-	TxEn    = machine.PA4  // RS485 DE/RE direction (header GPIO)
-	Led     = machine.PB0  // red LED
-	DebugTx = machine.PB6  // USART1_TX (PROG header) for the --serial uart console
-	DebugAF = 0            // USART1 alternate function for PB6
-	RfData  = machine.PA7  // PAN211x DATA (SPI1_MOSI), bidirectional
-	RfSck   = machine.PA9  // PAN211x SCK  (SPI1_SCK)
-	RfCs    = machine.PA10 // PAN211x CSN  (SPI1_NSS), active-low
+	UartTx   = machine.PA0 // RS485_TX, USART2_TX (AF9)
+	UartRx   = machine.PA3 // RS485_RX, USART2_RX (AF4)
+	UartTxAF = 9           // USART2_TX alternate function for PA0
+	UartRxAF = 4           // USART2_RX alternate function for PA3
+	TxEn     = machine.PA5 // RS485 DE/RE direction (RS485_TXEN)
+	Led      = machine.PB0 // status LED
+	DebugTx  = machine.PA7 // USART1_TX (DEBUG) for the --serial uart console
+	DebugAF  = 8           // USART1_TX alternate function for PA7
+	RfData   = machine.PA1 // PAN211x DATA (bit-banged SPI), bidirectional
+	RfSck    = machine.PA2 // PAN211x SCK  (bit-banged SPI)
+	RfCs     = machine.PA4 // PAN211x CSN  (bit-banged SPI), active-low
 
 	defaultPollMs = 1000
 )

@@ -41,12 +41,13 @@ func (s *bmsSource) Poll(dev *rig.Device) {
 
 func main() {
 	line := uartline.New(uartline.Config{
-		UART:    rig.UartBus,
-		TX:      rig.UartTx,
-		RX:      rig.UartRx,
-		AltFunc: rig.UartAF,
-		TxEn:    rig.TxEn,
-		Baud:    bmsBaud,
+		UART:      rig.UartBus,
+		TX:        rig.UartTx,
+		RX:        rig.UartRx,
+		TxAltFunc: rig.UartTxAF,
+		RxAltFunc: rig.UartRxAF,
+		TxEn:      rig.TxEn,
+		Baud:      bmsBaud,
 	})
 	s := &bmsSource{
 		client: nwbms.New(line),

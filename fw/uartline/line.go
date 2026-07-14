@@ -28,11 +28,13 @@ type Config struct {
 	// TX and RX are the UART data pins.
 	TX machine.Pin
 	RX machine.Pin
-	// AltFunc is the GPIO alternate-function number that routes the USART to
-	// the TX/RX pins (e.g. AF1 for PA2/PA3 = USART1 on PY32F030). The TinyGo
+	// TxAltFunc and RxAltFunc are the GPIO alternate-function numbers that route
+	// the USART to the TX and RX pins. They can differ: on the PY32F003 vertical
+	// board USART2_TX on PA0 is AF9 while USART2_RX on PA3 is AF4. The TinyGo
 	// py32 UART driver does not route the peripheral to pins itself, so New
-	// selects this alternate function on both TX and RX explicitly.
-	AltFunc uint8
+	// selects these alternate functions on TX and RX explicitly.
+	TxAltFunc uint8
+	RxAltFunc uint8
 	// TxEn drives the transceiver's DE/RE direction control (active-high while
 	// transmitting).
 	TxEn machine.Pin
@@ -80,9 +82,9 @@ func New(cfg Config) *Line {
 	// The py32 UART.Configure does not map the USART onto the requested pins,
 	// so route TX and RX to the peripheral via their alternate function here.
 	cfg.TX.Configure(machine.PinConfig{Mode: machine.PinAlternate})
-	cfg.TX.SetAltFunc(cfg.AltFunc)
+	cfg.TX.SetAltFunc(cfg.TxAltFunc)
 	cfg.RX.Configure(machine.PinConfig{Mode: machine.PinAlternate})
-	cfg.RX.SetAltFunc(cfg.AltFunc)
+	cfg.RX.SetAltFunc(cfg.RxAltFunc)
 
 	l := &Line{
 		uart:        u,
