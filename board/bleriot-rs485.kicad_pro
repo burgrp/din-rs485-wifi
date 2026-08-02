@@ -76,28 +76,7 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [
-        [
-          "silk_over_copper|137573608|75252641|f24eecb1-e26f-4d29-b067-ccef55464f97|00000000-0000-0000-0000-000000000000",
-          ""
-        ],
-        [
-          "silk_over_copper|137791605|72756004|0d0dc3fe-495c-4824-ab68-066ead5c8b9f|00000000-0000-0000-0000-000000000000",
-          ""
-        ],
-        [
-          "silk_over_copper|137791605|79243996|4eb5a09a-1f30-41c5-ba1b-c5fc0fb8bf27|00000000-0000-0000-0000-000000000000",
-          ""
-        ],
-        [
-          "starved_thermal|126250000|67000000|25e0c719-fe76-4756-8fab-03a259379224|44510205-304b-44ca-8c27-e81e5cfe3872|B.Cu",
-          ""
-        ],
-        [
-          "starved_thermal|132550000|82000000|25e0c719-fe76-4756-8fab-03a259379224|079f0805-89ca-4904-b09d-e860b306f960|F.Cu",
-          ""
-        ]
-      ],
+      "drc_exclusions": [],
       "meta": {
         "version": 2
       },
@@ -718,16 +697,16 @@
       {
         "filename": "bleriot-rs485.kicad_sch",
         "name": "vertical",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "uuid": "32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
       }
     ],
-    "used_designators": "",
+    "used_designators": "#FLG1-2,U5-6,R3-4,J3-4,X2,H1,D3-4,C8-12,A2,Y2,#PWR7,#PWR20-36",
     "variants": []
   },
   "sheets": [
     [
       "32f9e9f8-9d15-4d51-acc1-705de5fd2b71",
-      "Root"
+      "vertical"
     ]
   ],
   "text_variables": {},
