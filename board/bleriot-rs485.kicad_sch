@@ -1367,344 +1367,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Diode:BAT54S"
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "D"
-				(at 2.54 -5.08 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "BAT54S"
-				(at -6.35 3.175 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-				(at 1.905 3.175 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Datasheet" "https://www.diodes.com/assets/Datasheets/ds11005.pdf"
-				(at -3.048 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Vr 30V, If 200mA, Dual schottky barrier diode, in series, SOT-323"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "schottky diode"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "SOT?23*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "BAT54S_0_1"
-				(polyline
-					(pts
-						(xy -4.445 1.27) (xy -4.445 -1.27) (xy -2.54 0) (xy -4.445 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -3.81 0) (xy -1.27 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -3.175 -1.27) (xy -3.175 -1.016)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 1.27) (xy -1.905 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -3.175 -1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -2.54 -1.27) (xy -2.54 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.905 1.27) (xy -1.905 1.016)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.905 0) (xy 1.905 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 0 0)
-					(radius 0.254)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 0) (xy 3.81 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.905 1.27) (xy 1.905 -1.27) (xy 3.81 0) (xy 1.905 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 3.175 -1.27) (xy 3.175 -1.016)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 3.81 1.27) (xy 4.445 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 3.81 -1.27) (xy 3.175 -1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 3.81 -1.27) (xy 3.81 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 4.445 1.27) (xy 4.445 1.016)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "BAT54S_1_1"
-				(pin passive line
-					(at -7.62 0 0)
-					(length 3.81)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 7.62 0 180)
-					(length 3.81)
-					(name "K"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -5.08 90)
-					(length 5.08)
-					(name "COM"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "Drake:PAN2110P0AA"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -1937,23 +1599,25 @@
 			(in_pos_files yes)
 			(duplicate_pin_numbers_are_jumpers no)
 			(property "Reference" "X"
-				(at 0 6.35 0)
+				(at -4.318 -1.27 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
 					(font
 						(size 1.524 1.524)
 					)
+					(justify right)
 				)
 			)
 			(property "Value" "SWD"
-				(at 0 -6.35 0)
+				(at -4.318 1.27 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
 					(font
 						(size 1.524 1.524)
 					)
+					(justify right)
 				)
 			)
 			(property "Footprint" "Drake:SWD"
@@ -1988,36 +1652,22 @@
 					)
 				)
 			)
-			(symbol "SWD_0_1"
-				(rectangle
-					(start 3.81 3.81)
-					(end -3.81 -3.81)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 3.81 1.27) (xy -3.81 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
 			(symbol "SWD_1_1"
+				(rectangle
+					(start -3.81 2.54)
+					(end 2.54 -2.54)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type background)
+					)
+				)
 				(pin bidirectional line
-					(at 8.89 2.54 180)
+					(at 7.62 1.27 180)
 					(length 5.08)
-					(name "SWDIO"
+					(name "DIO"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2033,8 +1683,9 @@
 					)
 				)
 				(pin power_in line
-					(at 8.89 0 180)
+					(at 12.7 7.62 180)
 					(length 5.08)
+					(hide yes)
 					(name "GND"
 						(effects
 							(font
@@ -2051,9 +1702,9 @@
 					)
 				)
 				(pin bidirectional line
-					(at 8.89 -2.54 180)
+					(at 7.62 -1.27 180)
 					(length 5.08)
-					(name "SWCLK"
+					(name "CLK"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -3512,145 +3163,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "power:+3V3"
-			(power global)
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "#PWR"
-				(at 0 -3.81 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "+3V3"
-				(at 0 3.556 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Description" "Power symbol creates a global label with name \"+3V3\""
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "global power"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "+3V3_0_1"
-				(polyline
-					(pts
-						(xy -0.762 1.27) (xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 2.54) (xy 0.762 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 0) (xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "+3V3_1_1"
-				(pin power_in line
-					(at 0 0 90)
-					(length 0)
-					(name ""
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "power:+5V"
 			(power global)
 			(pin_numbers
@@ -4049,7 +3561,7 @@
 		(at 123.19 163.83)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "6ccd4fee-52d3-4bae-ab81-d8297f04bb41")
+		(uuid "64d75e63-9cea-41ab-ac3c-8ff026e5cf50")
 	)
 	(junction
 		(at 62.23 43.18)
@@ -4087,18 +3599,12 @@
 		(color 0 0 0 0)
 		(uuid "e9e6eb8b-6741-4976-b6d1-8124715f15a7")
 	)
-	(junction
-		(at 106.68 158.75)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "ffc95b46-8445-4385-85d1-94bfdb8e005e")
-	)
 	(no_connect
 		(at 171.45 69.85)
 		(uuid "0a4f0738-96ee-43d8-97cf-31ab4b42e2c2")
 	)
 	(no_connect
-		(at 212.09 59.69)
+		(at 212.09 64.77)
 		(uuid "318cb933-4392-441a-8406-20787198e744")
 	)
 	(no_connect
@@ -4171,33 +3677,23 @@
 	)
 	(wire
 		(pts
-			(xy 102.87 158.75) (xy 106.68 158.75)
+			(xy 144.78 157.48) (xy 143.51 156.21)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "0c59b6dc-0b43-4e0b-9a23-5a6f85a80913")
+		(uuid "101574c7-89b2-41c7-a79c-504125ce2ffa")
 	)
 	(wire
 		(pts
-			(xy 218.44 59.69) (xy 227.33 59.69)
+			(xy 212.09 59.69) (xy 214.63 59.69)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "1047ad6f-f685-4403-b3c8-517f678ee286")
-	)
-	(wire
-		(pts
-			(xy 106.68 158.75) (xy 109.22 158.75)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "10ffe977-9278-454b-aa55-0fd3b2e8db2b")
+		(uuid "10d07d23-55ce-48eb-aa9e-bed4f8716253")
 	)
 	(wire
 		(pts
@@ -4241,6 +3737,26 @@
 	)
 	(wire
 		(pts
+			(xy 144.78 162.56) (xy 143.51 161.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3175b96d-8b3d-4c4d-9075-b561eccdfcee")
+	)
+	(wire
+		(pts
+			(xy 121.92 160.02) (xy 123.19 158.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "33ef52b2-ebd6-4943-8793-70bdfb8d1546")
+	)
+	(wire
+		(pts
 			(xy 43.18 57.15) (xy 69.85 57.15)
 		)
 		(stroke
@@ -4248,6 +3764,26 @@
 			(type default)
 		)
 		(uuid "35f0852e-48ee-4ac7-852f-b527de9a07e0")
+	)
+	(wire
+		(pts
+			(xy 186.69 129.54) (xy 187.96 128.27)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "36b43f7b-3e6b-4638-97ad-c7b991bb1757")
+	)
+	(wire
+		(pts
+			(xy 123.19 163.83) (xy 123.19 161.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3d7708ba-05b6-4bb2-bf78-c765799bfc85")
 	)
 	(wire
 		(pts
@@ -4301,13 +3837,13 @@
 	)
 	(wire
 		(pts
-			(xy 212.09 62.23) (xy 218.44 62.23)
+			(xy 121.92 170.18) (xy 123.19 168.91)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "5136f6c9-08b6-42af-bf9c-1a93673250c7")
+		(uuid "4ccc1d90-2afc-41ab-88d1-93f92a19816f")
 	)
 	(wire
 		(pts
@@ -4331,16 +3867,6 @@
 	)
 	(wire
 		(pts
-			(xy 218.44 62.23) (xy 218.44 59.69)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5aa3a75f-674c-4a96-9cea-11361faef607")
-	)
-	(wire
-		(pts
 			(xy 152.4 67.31) (xy 154.94 67.31)
 		)
 		(stroke
@@ -4351,16 +3877,6 @@
 	)
 	(wire
 		(pts
-			(xy 106.68 158.75) (xy 106.68 173.99)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5bfe169d-53d8-48fa-b28f-60aec5965c8a")
-	)
-	(wire
-		(pts
 			(xy 100.33 62.23) (xy 109.22 62.23)
 		)
 		(stroke
@@ -4368,26 +3884,6 @@
 			(type default)
 		)
 		(uuid "5e59b087-b322-4233-ba61-abd33789a931")
-	)
-	(wire
-		(pts
-			(xy 116.84 173.99) (xy 116.84 168.91)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "65374b03-bd2b-43a5-901c-90b56f139dc9")
-	)
-	(wire
-		(pts
-			(xy 212.09 64.77) (xy 227.33 64.77)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "65838e0e-785f-465f-8701-272543212494")
 	)
 	(wire
 		(pts
@@ -4441,16 +3937,6 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 161.29) (xy 123.19 163.83)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "884154e8-95ba-4650-90bb-a411aa062155")
-	)
-	(wire
-		(pts
 			(xy 59.69 156.21) (xy 64.77 156.21)
 		)
 		(stroke
@@ -4458,16 +3944,6 @@
 			(type default)
 		)
 		(uuid "89ff02c4-c76e-4b30-8496-1ef732b9356e")
-	)
-	(wire
-		(pts
-			(xy 116.84 168.91) (xy 123.19 168.91)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8b27ab3c-3397-46f8-8e4c-1065e666cbf0")
 	)
 	(wire
 		(pts
@@ -4511,6 +3987,16 @@
 	)
 	(wire
 		(pts
+			(xy 212.09 62.23) (xy 214.63 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a5efe8a4-8ea7-4f9e-ae35-2c9f6cae4064")
+	)
+	(wire
+		(pts
 			(xy 133.35 146.05) (xy 133.35 148.59)
 		)
 		(stroke
@@ -4528,26 +4014,6 @@
 			(type default)
 		)
 		(uuid "b227e78a-91a9-4f7d-88ff-005a46e38f8c")
-	)
-	(wire
-		(pts
-			(xy 123.19 158.75) (xy 116.84 158.75)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bb7b51aa-e23f-4126-9c09-e97a6ce389fd")
-	)
-	(wire
-		(pts
-			(xy 111.76 163.83) (xy 123.19 163.83)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bdece057-b5b9-4f3e-9637-973ed37d7130")
 	)
 	(wire
 		(pts
@@ -4581,6 +4047,16 @@
 	)
 	(wire
 		(pts
+			(xy 121.92 165.1) (xy 123.19 163.83)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "eaab0cf3-13ea-444e-8d98-6a773ede1489")
+	)
+	(wire
+		(pts
 			(xy 161.29 67.31) (xy 171.45 67.31)
 		)
 		(stroke
@@ -4588,16 +4064,6 @@
 			(type default)
 		)
 		(uuid "eb8c31da-4aa0-473b-a9d4-311998220a5b")
-	)
-	(wire
-		(pts
-			(xy 111.76 173.99) (xy 111.76 163.83)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ecbcf16e-c6c8-4894-8764-bb203e4b1463")
 	)
 	(wire
 		(pts
@@ -4680,7 +4146,7 @@
 		(uuid "18e908be-978b-4bb4-8d0b-c3090f224363")
 	)
 	(label "RS485_B"
-		(at 143.51 161.29 0)
+		(at 144.78 162.56 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4700,7 +4166,7 @@
 		(uuid "24981afa-41e7-43cc-959e-eec9a91521d1")
 	)
 	(label "RS485_RX"
-		(at 106.68 173.99 270)
+		(at 121.92 160.02 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4720,7 +4186,7 @@
 		(uuid "4d965483-d485-4e4d-b58c-df8086d9c32d")
 	)
 	(label "LED"
-		(at 187.96 128.27 180)
+		(at 186.69 129.54 180)
 		(effects
 			(font
 				(size 1.524 1.524)
@@ -4740,7 +4206,7 @@
 		(uuid "7d063531-76c8-4e99-955c-79c8cc6f3676")
 	)
 	(label "RS485_TXEN"
-		(at 111.76 173.99 270)
+		(at 121.92 165.1 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4810,7 +4276,7 @@
 		(uuid "bb3e1de8-220a-4311-9976-28a45b17c2e9")
 	)
 	(label "RS485_TX"
-		(at 116.84 173.99 270)
+		(at 121.92 170.18 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4820,7 +4286,7 @@
 		(uuid "d9ee2a54-7969-47d4-bb99-67a6a1973eb9")
 	)
 	(label "RS485_A"
-		(at 143.51 156.21 0)
+		(at 144.78 157.48 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -4828,84 +4294,6 @@
 			(justify left bottom)
 		)
 		(uuid "e71f44c2-1262-4d7a-8d2f-18846af330dc")
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 133.35 143.51 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "00ea2f3f-e555-49a4-a463-7f7d816b2c48")
-		(property "Reference" "#PWR017"
-			(at 133.35 147.32 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+5V"
-			(at 133.35 140.0271 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 133.35 143.51 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 133.35 143.51 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 133.35 143.51 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "389e762a-6549-4681-bd3a-9124516c20a0")
-		)
-		(instances
-			(project "bleriot-rs485"
-				(path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-					(reference "#PWR017")
-					(unit 1)
-				)
-			)
-		)
 	)
 	(symbol
 		(lib_id "power:GND")
@@ -5276,8 +4664,8 @@
 		)
 	)
 	(symbol
-		(lib_id "power:GND")
-		(at 227.33 62.23 270)
+		(lib_id "power:+3.3V")
+		(at 133.35 143.51 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5285,9 +4673,9 @@
 		(on_board yes)
 		(in_pos_files yes)
 		(dnp no)
-		(uuid "12a763f9-6e86-4297-b50c-5cef6cc0bcba")
+		(uuid "0c8dfb11-75c7-43c3-b858-09b0acac0cd3")
 		(property "Reference" "#PWR035"
-			(at 220.98 62.23 0)
+			(at 133.35 147.32 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5297,8 +4685,8 @@
 				)
 			)
 		)
-		(property "Value" "GND"
-			(at 222.25 62.23 90)
+		(property "Value" "+3V3"
+			(at 133.35 139.7 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5308,7 +4696,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 227.33 62.23 0)
+			(at 133.35 143.51 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5319,7 +4707,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 227.33 62.23 0)
+			(at 133.35 143.51 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5329,8 +4717,8 @@
 				)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 227.33 62.23 0)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 133.35 143.51 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5341,91 +4729,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b7672994-3c8b-4306-a35d-caad7cbf3800")
+			(uuid "38f9321c-9dc6-477e-83da-e47386baf651")
 		)
 		(instances
 			(project "bleriot-rs485"
 				(path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
 					(reference "#PWR035")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 113.03 158.75 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "12fa1c2a-5764-4f9e-91bf-cc5f99cc014f")
-		(property "Reference" "R1"
-			(at 113.03 156.21 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "1k5"
-			(at 113.03 161.036 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 113.03 160.528 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 113.03 158.75 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 113.03 158.75 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "0b7c9889-0051-4b7a-91b4-7c62f59350b1")
-		)
-		(pin "2"
-			(uuid "05bad6ec-cacd-4191-88c9-9b85fcce58c6")
-		)
-		(instances
-			(project "bleriot-rs485"
-				(path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-					(reference "R1")
 					(unit 1)
 				)
 			)
@@ -5618,7 +4927,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "MAX485E"
+		(property "Value" "ST3485EBDR"
 			(at 135.3059 150.0601 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7316,83 +6625,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+3V3")
-		(at 97.79 151.13 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "ab3111b7-5f23-49ff-90f8-f90dba9d4274")
-		(property "Reference" "#PWR015"
-			(at 97.79 154.94 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "+3V3"
-			(at 97.79 144.78 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 97.79 151.13 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 97.79 151.13 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+3V3\""
-			(at 97.79 151.13 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "db837c65-c265-4adf-987a-e0e0d6e49e3e")
-		)
-		(instances
-			(project "bleriot-rs485"
-				(path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-					(reference "#PWR015")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 161.29 71.12 0)
 		(unit 1)
@@ -7705,169 +6937,6 @@
 			(project "bleriot-rs485"
 				(path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
 					(reference "C3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 97.79 166.37 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "afb23b51-74b7-47e4-b25e-0b0fd9b78897")
-		(property "Reference" "#PWR016"
-			(at 97.79 172.72 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 97.79 170.4261 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 97.79 166.37 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 97.79 166.37 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 97.79 166.37 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "134fda7b-aa7d-454b-b11e-c0935e92b345")
-		)
-		(instances
-			(project "bleriot-rs485"
-				(path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-					(reference "#PWR016")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Diode:BAT54S")
-		(at 97.79 158.75 90)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "b044f15f-2a6e-4251-b77b-a288d09825c2")
-		(property "Reference" "D1"
-			(at 95.25 160.0201 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "BAT54S"
-			(at 95.25 157.4801 90)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-			(at 94.615 156.845 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" "https://www.diodes.com/assets/Datasheets/ds11005.pdf"
-			(at 97.79 161.798 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Vr 30V, If 200mA, Dual schottky barrier diode, in series, SOT-323"
-			(at 97.79 158.75 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "3"
-			(uuid "fb49c8ec-05a3-4587-9d72-20dab36523dc")
-		)
-		(pin "2"
-			(uuid "a7384db4-73a2-473a-901c-ea208423d500")
-		)
-		(pin "1"
-			(uuid "3e1b0948-c7f5-4520-81d1-b718002ca480")
-		)
-		(instances
-			(project "bleriot-rs485"
-				(path "/32f9e9f8-9d15-4d51-acc1-705de5fd2b71"
-					(reference "D1")
 					(unit 1)
 				)
 			)
@@ -8970,7 +8039,7 @@
 	)
 	(symbol
 		(lib_id "Drake:SWD")
-		(at 236.22 62.23 180)
+		(at 222.25 60.96 180)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -8981,7 +8050,7 @@
 		(fields_autoplaced yes)
 		(uuid "f95f1c4f-0ecb-4d1d-9a10-fcbc56f1f04b")
 		(property "Reference" "X2"
-			(at 241.3 60.9599 0)
+			(at 227.33 59.6899 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -8992,7 +8061,7 @@
 			)
 		)
 		(property "Value" "SWD"
-			(at 241.3 63.4999 0)
+			(at 227.33 62.2299 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9003,7 +8072,7 @@
 			)
 		)
 		(property "Footprint" "Drake:SWD"
-			(at 236.22 53.34 0)
+			(at 222.25 52.07 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9014,7 +8083,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 236.22 62.23 0)
+			(at 222.25 60.96 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9024,7 +8093,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 236.22 62.23 0)
+			(at 222.25 60.96 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
