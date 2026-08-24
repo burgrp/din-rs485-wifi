@@ -19,10 +19,9 @@ const (
 	pinRadioData = machine.PA3
 	pinStatus    = machine.PF0
 
-	defaultPollMs     = 5000
-	defaultStaleScans = 3
-	readRetries       = 3
-	notifyInterval    = 5 * time.Millisecond
+	defaultPollMs  = 5000
+	readRetries    = 3
+	notifyInterval = 75 * time.Millisecond
 )
 
 var measurementTags = [...]uint16{
@@ -95,10 +94,9 @@ func setAtomicBit(value *atomic.Uint32, mask uint32, set bool) {
 }
 
 type meterPoller struct {
-	client   *modbusClient
-	device   *Device
-	config   spec.Config
-	failures [len(measurementTags)]uint8
+	client *modbusClient
+	device *Device
+	config spec.Config
 }
 
 func (poller *meterPoller) run() {
@@ -124,24 +122,16 @@ func (poller *meterPoller) pollRun(run spec.Run) {
 			break
 		}
 	}
+	if err != nil {
+		return
+	}
 
 	for offset := uint8(0); offset < run.Count; offset++ {
 		index := run.First + offset
-		if err != nil || !finiteFloat32Bits(values[offset]) {
-			poller.recordFailure(index)
+		if !finiteFloat32Bits(values[offset]) {
 			continue
 		}
-		poller.failures[index] = 0
 		poller.device.update(index, values[offset], true)
-	}
-}
-
-func (poller *meterPoller) recordFailure(index uint8) {
-	if poller.failures[index] < poller.config.StaleScans {
-		poller.failures[index]++
-	}
-	if poller.failures[index] >= poller.config.StaleScans {
-		poller.device.update(index, 0, false)
 	}
 }
 
@@ -215,9 +205,6 @@ func normalizedConfig(config spec.Config) (spec.Config, error) {
 	}
 	if config.PollMs == 0 {
 		config.PollMs = defaultPollMs
-	}
-	if config.StaleScans == 0 {
-		config.StaleScans = defaultStaleScans
 	}
 	return config, nil
 }

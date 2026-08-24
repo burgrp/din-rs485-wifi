@@ -56,7 +56,7 @@ func newRS485Transport(config spec.Config) (*rs485Transport, error) {
 		txEnable:         txEnable,
 		silentInterval:   silentInterval,
 		firstByteTimeout: 120 * time.Millisecond,
-		interByteTimeout: silentInterval,
+		interByteTimeout: 15 * time.Millisecond,
 	}, nil
 }
 
@@ -75,8 +75,7 @@ func configureParity(uart *machine.UART, parity spec.Parity) {
 }
 
 func (transport *rs485Transport) Exchange(request []byte, response []byte) (int, error) {
-	transport.flushReceiveBuffer()
-	time.Sleep(transport.silentInterval)
+	transport.waitForQuiet()
 	transport.txEnable.High()
 	time.Sleep(10 * time.Microsecond)
 	n, err := transport.uart.Write(request)
@@ -108,9 +107,21 @@ func (transport *rs485Transport) Exchange(request []byte, response []byte) (int,
 	return total, nil
 }
 
-func (transport *rs485Transport) flushReceiveBuffer() {
-	for transport.uart.Buffered() > 0 {
-		_, _ = transport.uart.ReadByte()
+func (transport *rs485Transport) waitForQuiet() {
+	deadline := monotonicNanos() + int64(transport.silentInterval)
+	for {
+		drained := false
+		for transport.uart.Buffered() > 0 {
+			_, _ = transport.uart.ReadByte()
+			drained = true
+		}
+		if drained {
+			deadline = monotonicNanos() + int64(transport.silentInterval)
+		}
+		if monotonicNanos() >= deadline {
+			return
+		}
+		time.Sleep(250 * time.Microsecond)
 	}
 }
 

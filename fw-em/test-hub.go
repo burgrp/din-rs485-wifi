@@ -19,7 +19,6 @@ func main() {
 		Parity:       spec.ParityEven,
 		WordOrder:    spec.WordOrderHighFirst,
 		PollMs:       5000,
-		StaleScans:   3,
 	}
 	cli.Start(inventory.Inventory{
 		{

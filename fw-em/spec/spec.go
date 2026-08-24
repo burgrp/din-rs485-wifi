@@ -19,7 +19,6 @@ type Config struct {
 	MeterAddress uint8
 	Parity       Parity
 	WordOrder    WordOrder
-	StaleScans   uint8
 	Baud         uint32
 	PollMs       uint32
 }
