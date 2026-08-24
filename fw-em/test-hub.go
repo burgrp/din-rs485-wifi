@@ -18,7 +18,8 @@ func main() {
 		Baud:         9600,
 		Parity:       spec.ParityEven,
 		WordOrder:    spec.WordOrderHighFirst,
-		PollMs:       5000,
+		PollMs:       500,
+		DisconnectMs: 5000,
 	}
 	cli.Start(inventory.Inventory{
 		{

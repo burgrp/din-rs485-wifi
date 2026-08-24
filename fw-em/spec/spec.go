@@ -21,6 +21,7 @@ type Config struct {
 	WordOrder    WordOrder
 	Baud         uint32
 	PollMs       uint32
+	DisconnectMs uint32
 }
 
 const (

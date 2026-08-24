@@ -5,7 +5,6 @@ package main
 import (
 	"machine"
 	"runtime"
-	"sync/atomic"
 	"time"
 
 	"github.com/burgrp/bleriot-rs485/fw-em/spec"
@@ -19,19 +18,11 @@ const (
 	pinRadioData = machine.PA3
 	pinStatus    = machine.PF0
 
-	defaultPollMs  = 5000
-	readRetries    = 3
-	notifyInterval = 75 * time.Millisecond
+	defaultPollMs       = 5000
+	defaultDisconnectMs = 15000
+	readRetries         = 3
+	notifyInterval      = 75 * time.Millisecond
 )
-
-var measurementTags = [...]uint16{
-	spec.RegVoltage1, spec.RegVoltage2, spec.RegVoltage3,
-	spec.RegCurrent1, spec.RegCurrent2, spec.RegCurrent3,
-	spec.RegPowerActiveTotal, spec.RegPowerActive1, spec.RegPowerActive2, spec.RegPowerActive3,
-	spec.RegPowerReactiveTotal, spec.RegPowerReactive1, spec.RegPowerReactive2, spec.RegPowerReactive3,
-	spec.RegPowerFactor1, spec.RegPowerFactor2, spec.RegPowerFactor3,
-	spec.RegFrequency, spec.RegEnergyActive, spec.RegEnergyReactive,
-}
 
 type firmwareConfigError string
 
@@ -44,59 +35,12 @@ const (
 	errWordOrder    firmwareConfigError = "invalid meter word order"
 )
 
-type Device struct {
-	values [len(measurementTags)]atomic.Int32
-	valid  atomic.Uint32
-	dirty  atomic.Uint32
-}
-
-func (device *Device) Read(tag uint16) (int32, bool) {
-	for index, candidate := range measurementTags {
-		if candidate == tag {
-			if device.valid.Load()&(uint32(1)<<index) == 0 {
-				return 0, true
-			}
-			return device.values[index].Load(), false
-		}
-	}
-	return 0, true
-}
-
-func (device *Device) Write(tag uint16, value int32, null bool) {}
-
-func (device *Device) update(index uint8, value int32, valid bool) {
-	mask := uint32(1) << index
-	wasValid := device.valid.Load()&mask != 0
-	oldValue := device.values[index].Load()
-
-	if valid {
-		device.values[index].Store(value)
-		setAtomicBit(&device.valid, mask, true)
-	} else {
-		setAtomicBit(&device.valid, mask, false)
-	}
-	if wasValid != valid || valid && oldValue != value {
-		setAtomicBit(&device.dirty, mask, true)
-	}
-}
-
-func setAtomicBit(value *atomic.Uint32, mask uint32, set bool) {
-	for {
-		old := value.Load()
-		updated := old | mask
-		if !set {
-			updated = old &^ mask
-		}
-		if old == updated || value.CompareAndSwap(old, updated) {
-			return
-		}
-	}
-}
-
 type meterPoller struct {
-	client *modbusClient
-	device *Device
-	config spec.Config
+	client     *modbusClient
+	device     *Device
+	config     spec.Config
+	freshness  [len(measurementTags)]measurementFreshness
+	disconnect int64
 }
 
 func (poller *meterPoller) run() {
@@ -106,6 +50,7 @@ func (poller *meterPoller) run() {
 			poller.pollRun(run)
 			runtime.Gosched()
 		}
+		poller.expireMeasurements(monotonicNanos())
 		remaining := int64(time.Duration(poller.config.PollMs)*time.Millisecond) - (monotonicNanos() - started)
 		if remaining > 0 {
 			time.Sleep(time.Duration(remaining))
@@ -126,12 +71,22 @@ func (poller *meterPoller) pollRun(run spec.Run) {
 		return
 	}
 
+	now := monotonicNanos()
 	for offset := uint8(0); offset < run.Count; offset++ {
 		index := run.First + offset
 		if !finiteFloat32Bits(values[offset]) {
 			continue
 		}
+		poller.freshness[index].record(now)
 		poller.device.update(index, values[offset], true)
+	}
+}
+
+func (poller *meterPoller) expireMeasurements(now int64) {
+	for index := range poller.freshness {
+		if poller.freshness[index].expire(now, poller.disconnect) {
+			poller.device.update(uint8(index), 0, false)
+		}
 	}
 }
 
@@ -163,10 +118,16 @@ func bleriotMain(provisioning node.Provisioning, config spec.Config) {
 
 	println("Bleriot RS485 energy meter starting")
 	println("meter", config.MeterAddress, "baud", config.Baud, "poll ms", config.PollMs)
-	go (&meterPoller{client: newModbusClient(transport), device: device, config: config}).run()
+	go (&meterPoller{
+		client:     newModbusClient(transport),
+		device:     device,
+		config:     config,
+		disconnect: int64(time.Duration(config.DisconnectMs) * time.Millisecond),
+	}).run()
 
 	var pending uint32
 	var nextNotify int64
+	var published notificationState
 	for {
 		n.Poll()
 		pending |= device.dirty.Swap(0)
@@ -174,9 +135,11 @@ func bleriotMain(provisioning node.Provisioning, config spec.Config) {
 			index := firstSetBit(pending)
 			mask := uint32(1) << index
 			value, null := device.Read(measurementTags[index])
-			n.Notify(measurementTags[index], value, null)
+			if published.changed(index, value, null) {
+				n.Notify(measurementTags[index], value, null)
+				nextNotify = monotonicNanos() + int64(notifyInterval)
+			}
 			pending &^= mask
-			nextNotify = monotonicNanos() + int64(notifyInterval)
 		}
 		runtime.Gosched()
 	}
@@ -205,6 +168,9 @@ func normalizedConfig(config spec.Config) (spec.Config, error) {
 	}
 	if config.PollMs == 0 {
 		config.PollMs = defaultPollMs
+	}
+	if config.DisconnectMs == 0 {
+		config.DisconnectMs = defaultDisconnectMs
 	}
 	return config, nil
 }
