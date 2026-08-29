@@ -21,7 +21,6 @@ const (
 	defaultPollMs       = 5000
 	defaultDisconnectMs = 15000
 	readRetries         = 3
-	notifyInterval      = 75 * time.Millisecond
 )
 
 type firmwareConfigError string
@@ -124,23 +123,8 @@ func bleriotMain(provisioning node.Provisioning, config spec.Config) {
 		config:     config,
 		disconnect: int64(time.Duration(config.DisconnectMs) * time.Millisecond),
 	}).run()
-
-	var pending uint32
-	var nextNotify int64
-	var published notificationState
 	for {
 		n.Poll()
-		pending |= device.dirty.Swap(0)
-		if pending != 0 && monotonicNanos() >= nextNotify {
-			index := firstSetBit(pending)
-			mask := uint32(1) << index
-			value, null := device.Read(measurementTags[index])
-			if published.changed(index, value, null) {
-				n.Notify(measurementTags[index], value, null)
-				nextNotify = monotonicNanos() + int64(notifyInterval)
-			}
-			pending &^= mask
-		}
 		runtime.Gosched()
 	}
 }
@@ -173,15 +157,6 @@ func normalizedConfig(config spec.Config) (spec.Config, error) {
 		config.DisconnectMs = defaultDisconnectMs
 	}
 	return config, nil
-}
-
-func firstSetBit(mask uint32) uint8 {
-	for index := uint8(0); index < 32; index++ {
-		if mask&(uint32(1)<<index) != 0 {
-			return index
-		}
-	}
-	return 0
 }
 
 func haltBlink(period time.Duration) {

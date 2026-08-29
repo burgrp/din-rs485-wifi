@@ -29,7 +29,7 @@ Set `WordOrderLowFirst` in an instance config only when a meter is verified to
 use swapped 16-bit words. A register remains null until its first valid response;
 after that, transient timeouts retain the last valid value. If a register has no
 valid response for 15 seconds, it changes to null once; a valid response restores
-it. Notifications are emitted only when the raw value or null state changes.
+it. Scheduled hub reads return the current raw value or null state.
 
 The transport waits for a continuously quiet RS485 bus before each request and
 allows a 15 ms inter-byte response gap for compatibility with this meter.

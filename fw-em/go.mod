@@ -2,7 +2,7 @@ module github.com/burgrp/bleriot-rs485/fw-em
 
 go 1.25.2
 
-require github.com/burgrp/bleriot/lib v1.2.0
+require github.com/burgrp/bleriot/lib v1.6.0
 
 require (
 	github.com/burgrp/reg v1.0.12 // indirect

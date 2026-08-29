@@ -2,40 +2,32 @@ package main
 
 import "testing"
 
-func TestDeviceMarksOnlyChangesDirty(t *testing.T) {
+func TestDeviceReadTracksUpdates(t *testing.T) {
 	device := &Device{}
 	const index = uint8(0)
-	const mask = uint32(1) << index
+	tag := measurementTags[index]
 
-	if _, null := device.Read(measurementTags[index]); !null {
+	if _, null := device.Read(tag); !null {
 		t.Fatal("new register is not null")
 	}
 
 	device.update(index, 123, true)
-	if got := device.dirty.Swap(0); got != mask {
-		t.Fatalf("initial value dirty mask = %#x, want %#x", got, mask)
-	}
-	device.update(index, 123, true)
-	if got := device.dirty.Swap(0); got != 0 {
-		t.Fatalf("unchanged value dirty mask = %#x, want 0", got)
+	if value, null := device.Read(tag); value != 123 || null {
+		t.Fatalf("initial update = (%d, %t), want (123, false)", value, null)
 	}
 
 	device.update(index, 124, true)
-	if got := device.dirty.Swap(0); got != mask {
-		t.Fatalf("changed value dirty mask = %#x, want %#x", got, mask)
+	if value, null := device.Read(tag); value != 124 || null {
+		t.Fatalf("changed update = (%d, %t), want (124, false)", value, null)
 	}
 	device.update(index, 0, false)
-	if got := device.dirty.Swap(0); got != mask {
-		t.Fatalf("null transition dirty mask = %#x, want %#x", got, mask)
-	}
-	device.update(index, 0, false)
-	if got := device.dirty.Swap(0); got != 0 {
-		t.Fatalf("repeated null dirty mask = %#x, want 0", got)
+	if _, null := device.Read(tag); !null {
+		t.Fatal("invalidated register is not null")
 	}
 
 	device.update(index, 124, true)
-	if got := device.dirty.Swap(0); got != mask {
-		t.Fatalf("recovery dirty mask = %#x, want %#x", got, mask)
+	if value, null := device.Read(tag); value != 124 || null {
+		t.Fatalf("recovered update = (%d, %t), want (124, false)", value, null)
 	}
 }
 
@@ -60,32 +52,5 @@ func TestMeasurementFreshnessExpiresOnce(t *testing.T) {
 	freshness.record(200 + timeout)
 	if !freshness.expire(200+2*timeout, timeout) {
 		t.Fatal("recovered measurement did not expire again")
-	}
-}
-
-func TestNotificationStatePublishesOnlyChanges(t *testing.T) {
-	var state notificationState
-	const index = uint8(0)
-
-	if !state.changed(index, 123, false) {
-		t.Fatal("initial value was suppressed")
-	}
-	if state.changed(index, 123, false) {
-		t.Fatal("duplicate value was published")
-	}
-	if !state.changed(index, 124, false) {
-		t.Fatal("changed value was suppressed")
-	}
-	if !state.changed(index, 0, true) {
-		t.Fatal("null transition was suppressed")
-	}
-	if state.changed(index, 999, true) {
-		t.Fatal("duplicate null was published")
-	}
-	if !state.changed(index, 124, false) {
-		t.Fatal("recovery was suppressed")
-	}
-	if state.changed(index, 124, false) {
-		t.Fatal("duplicate recovered value was published")
 	}
 }
